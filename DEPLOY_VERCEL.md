@@ -59,6 +59,7 @@ Notes:
 Project Settings -> Environment Variables:
 
 - `MONGO_URI` = your Atlas connection string
+- `MONGODB_URI` = optional alias for Mongo connection string
 - `JWT_SECRET` = long random secret (32+ chars)
 - `ADMIN_EMAIL` = admin login email
 - `ADMIN_PASSWORD` = strong admin password
@@ -68,7 +69,7 @@ Optional:
 - `ADMIN_USER` (legacy alias for admin email)
 - `AI_SERVICE_URL` if you later proxy to a separate AI service
 
-Important: This app now requires `MONGO_URI` in Vercel runtime. Without it, API init is blocked to avoid non-persistent file writes in serverless.
+Important: This app now requires `MONGO_URI` or `MONGODB_URI` in Vercel runtime. Without one of them, API init is blocked to avoid non-persistent file writes in serverless.
 
 ## 5) Deploy
 
