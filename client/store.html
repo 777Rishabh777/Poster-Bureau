@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Store setup products</title>
+    <meta name="description" content="Browse merch, manga, bags, bottles, tees, keychains, and room accessories. Posters stay out of the store page.">
+    <meta name="theme-color" content="#f8fbff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="storefront.css">
+    <style>
+        .store-hero { padding: 8.2rem 0 4rem; }
+        .store-layout { display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(300px, 0.9fr); gap:1.2rem; }
+        .store-stack { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1rem; }
+        .store-stack a { position:relative; overflow:hidden; border-radius:26px; }
+        .store-stack img { width:100%; height:100%; object-fit:cover; }
+        .toolbar { display:grid; grid-template-columns:1.05fr 0.95fr; gap:1rem; align-items:start; }
+        .filter-row { display:flex; flex-wrap:wrap; gap:0.75rem; }
+        .catalog-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1rem; }
+        .reveal { opacity:0; transform:translateY(20px); }
+        @media (max-width: 1100px) { .store-layout, .toolbar, .catalog-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 760px) { .store-layout, .toolbar, .catalog-grid, .store-stack { grid-template-columns:1fr; } .store-hero { padding-top:7rem; } }
+    </style>
+</head>
+<body data-page="store" class="text-slate-900 antialiased">
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-4 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <button class="icon-btn relative" type="button" data-cart-toggle aria-label="Open cart">
+                    <i class="fas fa-bag-shopping"></i>
+                    <span id="cart-count" class="absolute -right-1 -top-1 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <div id="cart-backdrop" class="cart-backdrop"></div>
+    <aside id="cart-panel" class="cart-panel">
+        <div class="h-full bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <div class="section-kicker">Cart</div>
+                    <h2 class="font-display text-2xl font-bold mt-3 tracking-[-0.05em]">Your setup bag</h2>
+                </div>
+                <button type="button" class="icon-btn" data-cart-close aria-label="Close cart"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+            <div class="smoke-card p-4">
+                <div class="flex items-center justify-between text-sm font-bold text-slate-500 uppercase tracking-[0.16em]">
+                    <span>Subtotal</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <a href="checkout.html" class="action-btn w-full mt-4">Checkout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="store-hero">
+        <section>
+            <div class="site-shell store-layout">
+                <div class="smoke-card p-6 md:p-8 reveal">
+                    <div class="section-kicker">Store page</div>
+                    <h1 class="hero-title mt-6">Everything around the poster. <span class="gradient-text">Nothing from the poster vault.</span></h1>
+                    <p class="hero-subtitle mt-6">This is the merch side of the site: manga, bottles, tees, bags, keychains, figures, and room extras. Posters stay on the homepage preview and Poster Vault page only.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8">
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Store items</div>
+                            <div class="font-display text-3xl font-bold mt-2 tracking-[-0.05em]" id="store-count">0</div>
+                        </div>
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Types</div>
+                            <div class="font-display text-3xl font-bold mt-2 tracking-[-0.05em]" id="type-count">0</div>
+                        </div>
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Browse mode</div>
+                            <div class="font-display text-xl font-bold mt-2 tracking-[-0.05em]">Merch only</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="store-stack reveal">
+                    <a class="smoke-card tilt-card" href="product.html?slug=hidden-leaf-chill-bottle"><img src="images/pexels-fotios-photos-4239023.jpg" alt="Bottle"></a>
+                    <a class="smoke-card tilt-card" href="product.html?slug=shadow-monarch-oversized-tee"><img src="images/2023-New-Solo-Leveling-T-Shirt-Cartoon-Anime-Men-3D-Printed-T-shirts-Casual-Harajuku-Summer.jpg" alt="Tee"></a>
+                    <a class="smoke-card tilt-card" href="product.html?slug=jjk-crew-canvas-tote"><img src="images/il_fullxfull.6179809252_rkr4.webp" alt="Tote"></a>
+                    <a class="smoke-card tilt-card" href="product.html?slug=collector-manga-vol-08"><img src="images/9781975319434_p0_v1_s600x595.jpg" alt="Manga"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell space-y-5">
+                <div class="toolbar reveal">
+                    <label class="smoke-card p-4 flex items-center gap-3">
+                        <i class="fas fa-magnifying-glass text-slate-400"></i>
+                        <input id="search-input" class="w-full bg-transparent outline-none" placeholder="Search manga, bottle, tee, keychain...">
+                    </label>
+                    <div class="smoke-card p-4 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Need a broader browse page?</div>
+                            <div class="font-bold mt-1">Open the Discover page for mood paths or jump straight into Poster Vault.</div>
+                        </div>
+                        <a href="collections.html" class="action-btn !py-3 !px-4">Discover</a>
+                    </div>
+                </div>
+                <div class="filter-row reveal" id="type-filters"></div>
+                <div class="catalog-grid" id="store-grid"></div>
+                <div id="store-empty" class="empty-card hidden reveal">No store items match that filter yet. Try another type or clear the search.</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 md:py-16">
+        <div class="site-shell smoke-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="font-display text-2xl font-bold tracking-[-0.06em]">BUREAU.</div>
+                <p class="text-slate-500 mt-2">Merch and setup products only. Posters stay in discover.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="collections.html" class="action-btn secondary">Discover</a>
+                <a href="help-center.html" class="action-btn">Help center</a>
+            </div>
+        </div>
+    </footer>
+    <script src="catalog.js"></script>
+    <script src="storefront.js"></script>
+    <script src="auth-nav.js"></script>
+    <script>
+        let products = [];
+        let activeType = 'All';
+
+        function cardTemplate(item) {
+            const mediaMarkup = item.kind === 'poster'
+                ? `<div class="showcase-mock"><div class="showcase-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div></div>`
+                : `<div class="showcase-mock no-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div>`;
+
+            return `
+                <article class="smoke-card catalog-card showcase-card reveal tilt-card">
+                    <a href="${window.BureauCatalog.buildProductUrl(item)}" class="catalog-thumb">
+                        <span class="showcase-sale">Sale</span>
+                        ${mediaMarkup}
+                        <button type="button" class="showcase-quick" data-add-cart="${item.slug}">Quick Add</button>
+                        <div class="catalog-badge pill" style="background:rgba(255,255,255,0.88);">${item.series || item.type}</div>
+                    </a>
+                    <div class="catalog-meta">
+                        <div>
+                            <div class="catalog-meta-top"><div class="catalog-icon-pill"><i class="fa-solid ${window.BureauUI.itemIconClass(item)}"></i><span>${item.type}</span></div><div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">${item.series} / ${item.highlight}</div></div>
+                            <h3 class="catalog-title mt-4">${item.title}</h3>
+                            <p class="catalog-copy mt-3">${item.subtitle}</p>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 mt-5">
+                            <div>
+                                <div class="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Price</div>
+                                <div class="font-display text-2xl font-bold tracking-[-0.05em]">${window.BureauCatalog.money(item.price)}</div>
+                            </div>
+                            <a href="${window.BureauCatalog.buildProductUrl(item)}" class="action-btn !py-3 !px-4">Open</a>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderFilters(types) {
+            const host = document.getElementById('type-filters');
+            host.innerHTML = ['All', ...types].map((type) => `
+                <button type="button" class="filter-chip ${type === activeType ? 'is-active' : ''}" data-type="${type}">${type}</button>
+            `).join('');
+            host.querySelectorAll('[data-type]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    activeType = button.getAttribute('data-type');
+                    renderGrid();
+                    renderFilters(types);
+                });
+            });
+        }
+
+        function renderGrid() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const filtered = window.BureauCatalog.filterItems(products, { kind: 'product', type: activeType, query });
+            const grid = document.getElementById('store-grid');
+            const empty = document.getElementById('store-empty');
+            const bySlug = new Map(products.map((item) => [item.slug, item]));
+            const cart = window.__storeCartApi;
+            document.getElementById('store-count').textContent = filtered.length;
+
+            if (!filtered.length) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = filtered.map(cardTemplate).join('');
+            grid.querySelectorAll('[data-add-cart]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const item = bySlug.get(button.getAttribute('data-add-cart'));
+                    if (!item || !cart) return;
+                    cart.add(item, { open: false });
+                });
+            });
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        }
+
+        function initMotion() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.reveal').forEach((node) => { node.style.opacity = '1'; node.style.transform = 'none'; });
+                return;
+            }
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.reveal').forEach((node) => {
+                gsap.to(node, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: node, start: 'top 88%', once: true } });
+            });
+        }
+
+        async function boot() {
+            window.BureauUI.hydrateNavigation({ current: 'store' });
+            window.BureauUI.mountMobileMenu();
+            window.__storeCartApi = window.BureauUI.mountCart();
+            const items = await window.BureauCatalog.fetchCatalog();
+            products = window.BureauCatalog.getProducts(items);
+            const types = [...new Set(products.map((item) => item.type))].sort((a, b) => a.localeCompare(b));
+            document.getElementById('type-count').textContent = types.length;
+
+            document.getElementById('search-input').addEventListener('input', renderGrid);
+            renderFilters(types);
+            renderGrid();
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        }
+
+        window.addEventListener('DOMContentLoaded', boot);
+    </script>
+</body>
+</html>
+
+
+
+

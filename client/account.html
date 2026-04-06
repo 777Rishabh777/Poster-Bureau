@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-slate-50">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | My Account — Profile & Orders</title>
+    <meta name="description" content="Manage your Bureau account, view orders, and update your profile settings.">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .tab-btn.active {
+            color: #4f46e5;
+            border-color: #4f46e5;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stat-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(79, 70, 229, 0.1);
+        }
+
+        .avatar-ring {
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            padding: 3px;
+            border-radius: 50%;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+    <!-- ═══ NAVIGATION ═══ -->
+    <nav class="fixed w-full z-[150] px-6 md:px-12 py-4 flex justify-between items-center glass-nav" id="navbar">
+        <a href="index.html" class="text-2xl font-display font-extrabold tracking-tight text-slate-900 cursor-pointer">
+            BUREAU<span class="text-indigo-600">.</span>
+        </a>
+        <div class="hidden lg:flex gap-8 font-medium text-sm text-slate-600">
+            <a href="index.html" class="hover:text-indigo-600 transition">Discover</a>
+            <a href="collections.html" class="hover:text-indigo-600 transition">Collections</a>
+            <a href="store.html" class="hover:text-indigo-600 transition">Store</a>
+            <a href="account.html" class="text-indigo-600 font-bold transition">Account</a>
+        </div>
+        <div class="flex items-center gap-5">
+            <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <a href="account.html" id="auth-link" class="hover:text-indigo-600 transition">Login / Register</a>
+            </div>
+            <button id="mobile-menu-btn"
+                class="lg:hidden w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 transition flex items-center justify-center"
+                aria-label="Open menu"><i class="fas fa-bars"></i></button>
+            <a href="index.html#vault" class="relative hover:scale-105 transition duration-300 text-slate-800">
+                <i class="fas fa-shopping-bag text-xl"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-slate-900/30 hidden z-[140]"></div>
+    <div id="mobile-menu"
+        class="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-white z-[160] translate-x-full transition-transform duration-300 shadow-2xl border-l border-slate-100 flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-slate-100">
+            <div class="text-xl font-display font-extrabold text-slate-900">Menu</div>
+            <button id="mobile-menu-close"
+                class="w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 transition flex items-center justify-center"
+                aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="p-6 flex-1 overflow-y-auto space-y-2 text-sm font-semibold">
+            <a class="block px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-700" href="index.html">Discover</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-700"
+                href="collections.html">Collections</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-700" href="store.html">Store</a>
+            <a class="block px-4 py-3 rounded-xl bg-indigo-50 text-indigo-700 font-bold" href="account.html">Account</a>
+        </div>
+    </div>
+
+    <!-- ═══ HERO PROFILE HEADER ═══ -->
+    <section
+        class="pt-28 pb-12 md:pt-32 md:pb-16 bg-gradient-to-b from-indigo-50/60 via-white to-slate-50 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.03]"
+            style="background-image: url('data:image/svg+xml,<svg width=60 height=60 xmlns=%22http://www.w3.org/2000/svg%22><circle cx=30 cy=30 r=1 fill=%22%234f46e5%22/></svg>');">
+        </div>
+        <div class="max-w-5xl mx-auto px-6 md:px-12 relative z-10">
+            <div class="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8">
+                <!-- Avatar -->
+                <div class="avatar-ring flex-shrink-0">
+                    <div id="avatar"
+                        class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-indigo-600 flex items-center justify-center text-white text-3xl md:text-4xl font-display font-extrabold">
+                        ?
+                    </div>
+                </div>
+                <!-- Info -->
+                <div class="text-center md:text-left flex-1">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold mb-3">
+                        <i class="fas fa-circle-check"></i> Active Member
+                    </div>
+                    <h1 id="profile-name" class="text-3xl md:text-4xl font-display font-extrabold text-slate-900 mb-1">
+                        Loading...</h1>
+                    <p id="profile-email" class="text-slate-500 font-medium text-sm md:text-base">—</p>
+                    <p id="profile-since" class="text-slate-400 text-xs font-bold mt-2 uppercase tracking-widest">Member
+                        since —</p>
+                </div>
+                <!-- Quick Actions -->
+                <div class="flex gap-3 flex-shrink-0">
+                    <a href="collections.html"
+                        class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-slate-900 text-white font-bold text-sm transition-colors shadow-lg shadow-indigo-600/20">
+                        <i class="fas fa-palette mr-1"></i> Browse
+                    </a>
+                    <button id="logout-btn"
+                        class="px-5 py-3 rounded-xl bg-white border border-slate-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-700 font-bold text-sm transition shadow-sm">
+                        <i class="fas fa-arrow-right-from-bracket mr-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ STATS BAR ═══ -->
+    <section class="py-6 bg-white border-y border-slate-100">
+        <div class="max-w-5xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="stat-card bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center">
+                <div class="text-2xl font-display font-extrabold text-indigo-600" id="stat-orders">0</div>
+                <div class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-widest">Orders</div>
+            </div>
+            <div class="stat-card bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center">
+                <div class="text-2xl font-display font-extrabold text-purple-600" id="stat-wishlist">0</div>
+                <div class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-widest">Wishlist</div>
+            </div>
+            <div class="stat-card bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center">
+                <div class="text-2xl font-display font-extrabold text-emerald-600" id="stat-cart">0</div>
+                <div class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-widest">In Cart</div>
+            </div>
+            <div class="stat-card bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center">
+                <div class="text-2xl font-display font-extrabold text-amber-600" id="stat-spent">$0</div>
+                <div class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-widest">Total Spent</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ TABS SECTION ═══ -->
+    <section class="max-w-5xl mx-auto px-6 md:px-12 py-10">
+        <!-- Tab Buttons -->
+        <div class="flex gap-1 border-b border-slate-200 mb-8 overflow-x-auto scrollbar-hide">
+            <button
+                class="tab-btn active px-5 py-3 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-indigo-600 transition whitespace-nowrap"
+                data-tab="overview"><i class="fas fa-grid-2 mr-2"></i>Overview</button>
+            <button
+                class="tab-btn px-5 py-3 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-indigo-600 transition whitespace-nowrap"
+                data-tab="orders"><i class="fas fa-receipt mr-2"></i>Order History</button>
+            <button
+                class="tab-btn px-5 py-3 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-indigo-600 transition whitespace-nowrap"
+                data-tab="wishlist"><i class="fas fa-heart mr-2"></i>Wishlist</button>
+            <button
+                class="tab-btn px-5 py-3 border-b-2 border-transparent text-sm font-bold text-slate-500 hover:text-indigo-600 transition whitespace-nowrap"
+                data-tab="settings"><i class="fas fa-gear mr-2"></i>Settings</button>
+        </div>
+
+        <!-- TAB: Overview -->
+        <div class="tab-content active" id="tab-overview">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Quick Links -->
+                <a href="collections.html"
+                    class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-palette"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-900">Browse Posters</div>
+                            <div class="text-sm text-slate-500 mt-0.5">Explore our full poster collection</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="store.html"
+                    class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 text-xl group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-bag-shopping"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-900">Accessories Store</div>
+                            <div class="text-sm text-slate-500 mt-0.5">Manga, keychains, bottles & more</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="checkout.html"
+                    class="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            <i class="fas fa-credit-card"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-900">Checkout</div>
+                            <div class="text-sm text-slate-500 mt-0.5">Complete your purchase</div>
+                        </div>
+                    </div>
+                </a>
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 text-white">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-2xl"><i
+                                class="fas fa-microchip"></i></div>
+                        <div>
+                            <div class="font-bold">NFC Verified Prints</div>
+                            <div class="text-sm text-white/70 mt-0.5">All posters include authenticity chip</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="mt-8 bg-white border border-slate-200 rounded-2xl p-6">
+                <h3 class="font-display font-extrabold text-lg text-slate-900 mb-4"><i
+                        class="fas fa-clock-rotate-left text-slate-400 mr-2"></i>Recent Activity</h3>
+                <div id="recent-activity" class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm text-slate-500 py-3 border-b border-slate-50">
+                        <div
+                            class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs">
+                            <i class="fas fa-user-plus"></i></div>
+                        <span>Account created — Welcome to Bureau!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Orders -->
+        <div class="tab-content" id="tab-orders">
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+                <div
+                    class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-3xl mx-auto mb-4">
+                    <i class="fas fa-receipt"></i></div>
+                <h3 class="font-display font-extrabold text-xl text-slate-900 mb-2">No Orders Yet</h3>
+                <p class="text-slate-500 text-sm font-medium max-w-sm mx-auto mb-6">Once you place an order, it will
+                    appear here with tracking details and status.</p>
+                <a href="collections.html"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-slate-900 text-white font-bold text-sm transition-colors shadow-md">
+                    <i class="fas fa-palette"></i> Start Shopping
+                </a>
+            </div>
+        </div>
+
+        <!-- TAB: Wishlist -->
+        <div class="tab-content" id="tab-wishlist">
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+                <div
+                    class="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center text-red-400 text-3xl mx-auto mb-4">
+                    <i class="fas fa-heart"></i></div>
+                <h3 class="font-display font-extrabold text-xl text-slate-900 mb-2">Your Wishlist is Empty</h3>
+                <p class="text-slate-500 text-sm font-medium max-w-sm mx-auto mb-6">Save posters and accessories you
+                    love to your wishlist for later.</p>
+                <a href="collections.html"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm transition-colors shadow-md">
+                    <i class="fas fa-heart"></i> Find Something You Love
+                </a>
+            </div>
+        </div>
+
+        <!-- TAB: Settings -->
+        <div class="tab-content" id="tab-settings">
+            <div class="space-y-6">
+                <!-- Profile Settings -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mb-6"><i
+                            class="fas fa-user text-indigo-600 mr-2"></i>Profile Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-2 block">Full
+                                Name</label>
+                            <input id="settings-name" type="text"
+                                class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                                placeholder="Your name">
+                        </div>
+                        <div>
+                            <label
+                                class="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-2 block">Email</label>
+                            <input id="settings-email" type="email"
+                                class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none cursor-not-allowed opacity-60"
+                                readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mb-6"><i
+                            class="fas fa-bell text-purple-600 mr-2"></i>Preferences</h3>
+                    <div class="space-y-4">
+                        <label
+                            class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer group">
+                            <div>
+                                <div class="font-bold text-sm text-slate-900">Email Notifications</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Get notified about new drops & sales</div>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-slate-300 peer-checked:bg-indigo-600 rounded-full transition-colors">
+                                </div>
+                                <div
+                                    class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform">
+                                </div>
+                            </div>
+                        </label>
+                        <label
+                            class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer group">
+                            <div>
+                                <div class="font-bold text-sm text-slate-900">Order Updates</div>
+                                <div class="text-xs text-slate-500 mt-0.5">SMS tracking for shipments</div>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-slate-300 peer-checked:bg-indigo-600 rounded-full transition-colors">
+                                </div>
+                                <div
+                                    class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform">
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="bg-white border border-red-200 rounded-2xl p-6 md:p-8">
+                    <h3 class="font-display font-extrabold text-lg text-red-600 mb-2"><i
+                            class="fas fa-triangle-exclamation mr-2"></i>Danger Zone</h3>
+                    <p class="text-slate-500 text-sm mb-4">Logging out will remove your session. You'll need to sign in
+                        again.</p>
+                    <button onclick="doLogout()"
+                        class="px-5 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 font-bold text-sm hover:bg-red-100 transition">
+                        <i class="fas fa-arrow-right-from-bracket mr-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-12">
+        <div class="max-w-5xl mx-auto px-6 md:px-12 text-center">
+            <div class="text-2xl font-display font-extrabold text-white mb-3">BUREAU<span
+                    class="text-indigo-400">.</span></div>
+            <p class="text-sm">© 2026 The Poster Bureau. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const TOKEN_KEY = 'bureau_user_token';
+        const CART_KEY = 'bureau_cart_v1';
+        const API_ORIGIN = (location.origin && location.origin !== 'null') ? location.origin : 'http://localhost:5000';
+        const API_URL = `${API_ORIGIN}/api`;
+
+        function decodeJwt(token) {
+            try {
+                const payload = token.split('.')[1];
+                const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+                return JSON.parse(json);
+            } catch {
+                return null;
+            }
+        }
+
+        function authHeaders() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            return token ? { Authorization: `Bearer ${token}` } : {};
+        }
+
+        function money(value) {
+            return '$' + Number(value || 0).toFixed(2);
+        }
+
+        function formatDate(value) {
+            return new Date(value).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+            window.location.href = 'login.html?returnTo=account.html';
+        }
+
+        const payload = decodeJwt(token || '');
+        const name = (payload && payload.name) ? payload.name : 'User';
+        const email = (payload && payload.email) ? payload.email : '�';
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+
+        document.getElementById('avatar').innerText = initials;
+        document.getElementById('profile-name').innerText = name;
+        document.getElementById('profile-email').innerText = email;
+        document.getElementById('settings-name').value = name;
+        document.getElementById('settings-email').value = email;
+
+        if (payload && payload.iat) {
+            const d = new Date(payload.iat * 1000);
+            document.getElementById('profile-since').innerText = 'Member since ' + d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        try {
+            const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            document.getElementById('stat-cart').innerText = Array.isArray(cart) ? cart.length : 0;
+        } catch {
+            document.getElementById('stat-cart').innerText = 0;
+        }
+
+        function renderRecentActivity(orders) {
+            const host = document.getElementById('recent-activity');
+            if (!host) return;
+
+            const activities = [];
+            activities.push(`
+                <div class="flex items-center gap-3 text-sm text-slate-500 py-3 border-b border-slate-50">
+                    <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <span>Account created � welcome to Bureau.</span>
+                </div>
+            `);
+
+            (orders || []).slice(0, 3).forEach((order) => {
+                activities.push(`
+                    <div class="flex items-center gap-3 text-sm text-slate-500 py-3 border-b border-slate-50 last:border-b-0">
+                        <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 text-xs">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <span>${order.orderNumber} placed on ${formatDate(order.createdAt)} � ${money(order.total)}</span>
+                    </div>
+                `);
+            });
+
+            host.innerHTML = activities.join('');
+        }
+
+        function renderOrders(orders) {
+            const host = document.getElementById('tab-orders');
+            if (!host) return;
+
+            if (!orders.length) {
+                host.innerHTML = `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-3xl mx-auto mb-4">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3 class="font-display font-extrabold text-xl text-slate-900 mb-2">No Orders Yet</h3>
+                        <p class="text-slate-500 text-sm font-medium max-w-sm mx-auto mb-6">Once you place an order, it will appear here with status and line items.</p>
+                        <a href="checkout.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-slate-900 text-white font-bold text-sm transition-colors shadow-md">
+                            <i class="fas fa-credit-card"></i> Go to Checkout
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            host.innerHTML = `
+                <div class="space-y-4">
+                    ${orders.map((order) => `
+                        <article class="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm">
+                            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
+                                <div>
+                                    <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400">${order.orderNumber}</div>
+                                    <h3 class="font-display font-extrabold text-xl text-slate-900 mt-2">${order.shipping && order.shipping.city ? order.shipping.city : 'Saved Order'} Delivery</h3>
+                                    <div class="text-sm text-slate-500 font-medium mt-1">Placed on ${formatDate(order.createdAt)}</div>
+                                </div>
+                                <div class="text-left md:text-right">
+                                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-extrabold uppercase tracking-widest">${order.status}</div>
+                                    <div class="text-2xl font-display font-extrabold text-slate-900 mt-3">${money(order.total)}</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${(order.items || []).map((item) => `
+                                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-2xl p-3">
+                                        <div class="w-14 h-14 rounded-xl overflow-hidden bg-white border border-slate-200 flex-shrink-0">
+                                            <img src="${item.image_url || ''}" class="w-full h-full object-cover" alt="${item.title}">
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-slate-900 truncate">${item.title}</div>
+                                            <div class="text-sm text-slate-500 font-medium">Qty ${item.quantity} � ${money(item.line_total)}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </article>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function loadOrders() {
+            try {
+                const res = await fetch(`${API_URL}/orders/my`, { headers: { ...authHeaders() } });
+                if (!res.ok) throw new Error('Orders unavailable');
+                const orders = await res.json();
+                const safeOrders = Array.isArray(orders) ? orders : [];
+                const totalSpent = safeOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+
+                document.getElementById('stat-orders').innerText = safeOrders.length;
+                document.getElementById('stat-spent').innerText = money(totalSpent);
+                renderOrders(safeOrders);
+                renderRecentActivity(safeOrders);
+            } catch {
+                renderOrders([]);
+                renderRecentActivity([]);
+                document.getElementById('stat-orders').innerText = '0';
+                document.getElementById('stat-spent').innerText = '$0.00';
+            }
+        }
+
+        function doLogout() {
+            localStorage.removeItem(TOKEN_KEY);
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', doLogout);
+        window.doLogout = doLogout;
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileOverlay = document.getElementById('mobile-menu-overlay');
+        function openMobileMenu() { mobileMenu.classList.remove('translate-x-full'); mobileOverlay.classList.remove('hidden'); }
+        function closeMobileMenu() { mobileMenu.classList.add('translate-x-full'); mobileOverlay.classList.add('hidden'); }
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+        if (mobileMenuClose) mobileMenuClose.addEventListener('click', closeMobileMenu);
+        if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+
+        gsap.from('.stat-card', { y: 20, opacity: 0, stagger: 0.08, duration: 0.5, delay: 0.3, ease: 'power2.out' });
+        loadOrders();
+    </script>    <script src="auth-nav.js"></script>
+</body>
+
+</html>

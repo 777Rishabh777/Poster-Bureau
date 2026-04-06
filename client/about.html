@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-slate-50">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | About Us — Our Story</title>
+    <meta name="description"
+        content="Learn about The Poster Bureau — a premium poster brand bringing gallery-grade prints to your walls.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+        }
+
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .site-shell {
+            width: min(1440px, calc(100vw - 32px));
+            margin: 0 auto;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(255, 255, 255, 0.85);
+            color: #0f172a;
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+        }
+
+        .nav-link {
+            color: #334155;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #0f172a;
+            transform: translateY(-1px);
+        }
+
+        .bureau-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 0.9rem;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.83rem;
+            color: #475569;
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+
+        .bureau-nav-link:hover {
+            background: rgba(255, 255, 255, 0.72);
+            color: #0f172a;
+        }
+
+        .bureau-nav-link.is-active {
+            background: rgba(255, 255, 255, 0.96);
+            color: #0f172a;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .bureau-nav-link-mobile {
+            justify-content: flex-start;
+            width: 100%;
+            padding: 0.95rem 0.2rem;
+            border-radius: 1rem;
+        }
+
+        .nav-link-icon {
+            font-size: 0.84rem;
+            color: #64748b;
+        }
+
+        .bureau-nav-dropdown {
+            position: relative;
+        }
+
+        .bureau-nav-dropdown-toggle {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .bureau-nav-caret {
+            font-size: 0.78rem;
+            opacity: 0.75;
+            margin-left: 0.1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .bureau-nav-dropdown.is-open .bureau-nav-caret {
+            transform: rotate(180deg);
+        }
+
+        .bureau-nav-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.55rem);
+            left: 0;
+            min-width: 210px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(8, 10, 16, 0.96);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+            padding: 0.5rem;
+            display: none;
+            z-index: 60;
+        }
+
+        .bureau-nav-dropdown.is-open .bureau-nav-dropdown-menu {
+            display: grid;
+        }
+
+        .bureau-nav-dropdown-item {
+            display: block;
+            color: rgba(255, 255, 255, 0.92);
+            padding: 0.5rem 0.7rem;
+            border-radius: 9px;
+            font-size: 0.86rem;
+            text-decoration: none;
+            transition: background-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .bureau-nav-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(2px);
+        }
+
+        .bureau-nav-submenu-mobile {
+            margin: 0.2rem 0 0.8rem 1.5rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            padding-left: 0.7rem;
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .bureau-nav-sublink {
+            font-size: 0.84rem;
+            opacity: 0.85;
+            padding: 0.45rem 0.65rem;
+        }
+
+        .help-dropdown {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(6px);
+            transition: all 0.25s ease;
+            padding-top: 14px;
+        }
+
+        .help-dropdown::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 14px;
+            background: transparent;
+        }
+
+        .help-trigger:hover .help-dropdown,
+        .help-dropdown:hover,
+        .help-trigger.open .help-dropdown {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body data-page="help" class="antialiased">
+
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-4 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <!-- HERO -->
+    <section
+        class="pt-10 pb-16 md:pt-14 md:pb-20 bg-gradient-to-b from-indigo-50/60 via-white to-slate-50 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.03]"
+            style="background-image: url('data:image/svg+xml,<svg width=60 height=60 xmlns=%22http://www.w3.org/2000/svg%22><circle cx=30 cy=30 r=1 fill=%22%234f46e5%22/></svg>');">
+        </div>
+        <div class="max-w-4xl mx-auto px-6 md:px-12 text-center relative z-10">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-6">
+                <i class="fas fa-building-columns"></i> About Us
+            </div>
+            <h1 class="text-4xl md:text-6xl font-display font-extrabold text-slate-900 leading-tight mb-6">
+                The Story Behind <br><span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Bureau.</span>
+            </h1>
+            <p class="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto font-medium">We believe every wall deserves
+                art that speaks. Bureau brings gallery-grade poster prints to your space — curated with passion.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section class="py-16 px-6 md:px-12">
+        <div class="max-w-4xl mx-auto space-y-16" id="about-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-display font-extrabold text-slate-900 mb-4">Our Mission</h2>
+                    <p class="text-slate-600 leading-relaxed">Founded in 2024, The Poster Bureau was born from a simple
+                        idea: premium art shouldn't require premium prices. We curate, print, and deliver gallery-grade
+                        posters that transform any space into a personal gallery.</p>
+                    <p class="text-slate-600 leading-relaxed mt-4">Every print is produced on 300GSM museum-quality
+                        paper with archival inks that resist fading for 100+ years. We don't just sell posters — we
+                        deliver experiences.</p>
+                </div>
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-8 text-white">
+                    <div class="text-5xl font-display font-extrabold mb-2">500+</div>
+                    <div class="text-white/70 font-medium">Premium designs across Anime, Gaming, Marvel, and Automotive
+                    </div>
+                    <div class="mt-6 grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-extrabold">10K+</div>
+                            <div class="text-white/60 text-xs font-bold uppercase">Happy Customers</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-extrabold">4.9★</div>
+                            <div class="text-white/60 text-xs font-bold uppercase">Avg Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div
+                    class="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mx-auto mb-4">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mb-2">Premium Quality</h3>
+                    <p class="text-slate-500 text-sm">300GSM paper, archival inks, museum-grade printing technology.</p>
+                </div>
+                <div
+                    class="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 text-2xl mx-auto mb-4">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mb-2">NFC Authenticity</h3>
+                    <p class="text-slate-500 text-sm">Every print ships with an embedded NFC chip to verify
+                        authenticity.</p>
+                </div>
+                <div
+                    class="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-2xl mx-auto mb-4">
+                        <i class="fas fa-truck-fast"></i>
+                    </div>
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mb-2">Fast Shipping</h3>
+                    <p class="text-slate-500 text-sm">Carefully packaged in rigid tubes and shipped across India in 3-5
+                        days.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-3xl p-8 md:p-12">
+                <h2 class="text-2xl md:text-3xl font-display font-extrabold text-slate-900 mb-4">Why Bureau?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div class="flex gap-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0 mt-0.5">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Curated, Not Random</h4>
+                            <p class="text-slate-500 text-sm mt-1">Every design is handpicked by our creative team — no
+                                generic clip-art.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 flex-shrink-0 mt-0.5">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Made-to-Order</h4>
+                            <p class="text-slate-500 text-sm mt-1">Zero waste — every poster is printed fresh when you
+                                order it.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0 mt-0.5">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Eco-Conscious</h4>
+                            <p class="text-slate-500 text-sm mt-1">Sustainable inks and recyclable packaging for a
+                                greener planet.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0 mt-0.5">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900">Fair Pricing</h4>
+                            <p class="text-slate-500 text-sm mt-1">Gallery quality without the gallery price tag —
+                                starting at ₹199.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="max-w-5xl mx-auto px-6 md:px-12 text-center">
+            <div class="text-2xl font-display font-extrabold text-white mb-3">BUREAU<span
+                    class="text-indigo-400">.</span></div>
+            <p class="text-sm mb-4">© 2026 The Poster Bureau. All rights reserved.</p>
+            <div class="flex justify-center gap-6 text-sm">
+                <a href="about.html" class="hover:text-white transition">About</a>
+                <a href="contact.html" class="hover:text-white transition">Contact</a>
+                <a href="terms.html" class="hover:text-white transition">Terms</a>
+                <a href="shipping.html" class="hover:text-white transition">Shipping</a>
+                <a href="faq.html" class="hover:text-white transition">FAQ</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="storefront.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.BureauUI && window.BureauUI.hydrateNavigation) {
+                window.BureauUI.hydrateNavigation({ current: 'help' });
+            }
+            if (window.BureauUI && window.BureauUI.mountMobileMenu) {
+                window.BureauUI.mountMobileMenu();
+            }
+        });
+    </script>
+    <script src="auth-nav.js"></script>
+</body>
+
+</html>

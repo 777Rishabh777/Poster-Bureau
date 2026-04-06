@@ -1,0 +1,1435 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Story-led anime posters and setup merch</title>
+    <meta name="description" content="Story-driven anime poster storefront with a live poster vault, accessories preview, discover page, and help center.">
+    <meta name="theme-color" content="#f8fbff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="storefront.css">
+    <style>
+        .offers-bar { background: linear-gradient(90deg, rgba(8, 17, 31, 0.98), rgba(30, 41, 59, 0.98), rgba(8, 17, 31, 0.98)); color: #e2e8f0; overflow: hidden; white-space: nowrap; position: sticky; top: 0; z-index: 60; }
+        .offers-track { display: flex; min-width: max-content; animation: offersTicker 34s linear infinite; }
+        @keyframes offersTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .offer-item { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0 1.2rem; min-height: 2.4rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+        .sep { color: #f97316; }
+        .story-grid, .preview-grid, .jump-grid, .wall-grid, .help-grid { display: grid; gap: 1rem; }
+        .story-grid, .preview-grid, .help-grid, .jump-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .help-grid-square { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+        .help-grid-square .help-card {
+            aspect-ratio: 1 / 1;
+            height: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .help-grid-square .pill { align-self: flex-start; }
+        .help-grid-square .help-title {
+            font-size: clamp(1.12rem, 1.28vw, 1.45rem);
+            line-height: 1.22;
+            margin-top: 0.8rem;
+        }
+        .help-grid-square .help-copy {
+            margin-top: 0.55rem;
+            font-size: 0.98rem;
+            line-height: 1.42;
+            color: #5f6f85;
+        }
+        .jump-card { position: relative; min-height: 23rem; overflow: hidden; border-radius: 30px; color: white; text-decoration: none; }
+        .jump-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.55s ease; }
+        .jump-card:hover img { transform: scale(1.08); }
+        .jump-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 17, 31, 0.04) 15%, rgba(8, 17, 31, 0.86) 100%); }
+        .jump-copy { position: absolute; inset: auto 1.25rem 1.25rem 1.25rem; z-index: 1; }
+        .wall-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .wall-photo { aspect-ratio: 1 / 1; overflow: hidden; border-radius: 24px; border: 1px solid rgba(148, 163, 184, 0.18); box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08); }
+        .wall-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .reveal { opacity: 0; transform: translateY(24px); }
+        @media (max-width: 1180px) { .story-grid, .preview-grid, .jump-grid, .help-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 900px) { .wall-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) {
+            .story-grid, .preview-grid, .jump-grid, .help-grid, .wall-grid { grid-template-columns: 1fr; }
+            .help-grid-square .help-card { aspect-ratio: auto; min-height: 15.5rem; }
+            .jump-card { min-height: 18rem; }
+        }
+    </style>
+    <style>
+        .hero-stage {
+            position: relative;
+            min-height: auto;
+            height: auto;
+            padding: 1rem 0;
+            overflow: hidden;
+            margin-top: -5.5rem;
+            padding-top: 5.5rem;
+        }
+
+        .hero-stage::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 16% 12%, rgba(79, 70, 229, 0.26), transparent 28%),
+                radial-gradient(circle at 84% 18%, rgba(249, 115, 22, 0.24), transparent 26%),
+                radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.14), transparent 30%),
+                linear-gradient(180deg, rgba(8, 15, 31, 0.04), rgba(8, 15, 31, 0.12));
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero-stage::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(148, 163, 184, 0.28) 0.8px, transparent 0.8px),
+                radial-gradient(circle, rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+            background-size: 170px 170px, 250px 250px;
+            background-position: 0 0, 90px 90px;
+            opacity: 0.24;
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: relative;
+            min-height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-copy-wrap {
+            position: relative;
+            z-index: 7;
+            width: min(100%, 48rem);
+            min-height: 0;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2rem;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            border-radius: 0;
+            text-align: center;
+            overflow: visible;
+        }
+
+        .hero-copy-wrap::before {
+            display: none;
+        }
+
+        .hero-center-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.78rem 1.06rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.2);
+            color: #f8fafc;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            max-width: 10.6ch;
+            margin: 0 auto;
+            font-size: clamp(3.75rem, 10vw, 7.9rem);
+            line-height: 0.9;
+            letter-spacing: -0.08em;
+            will-change: transform;
+            text-shadow: 0 10px 24px rgba(8, 15, 31, 0.08);
+        }
+
+        .hero-subtitle {
+            max-width: 44rem;
+            margin: 0 auto;
+            color: #405067;
+            text-align: center;
+            font-size: clamp(1.02rem, 1.8vw, 1.26rem);
+            line-height: 1.72;
+            will-change: transform;
+            font-weight: 600;
+        }
+
+        .hero-copy-shell {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .hero-action-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.9rem;
+        }
+
+        .hero-action-row .action-btn:hover,
+        .hero-action-row .action-btn.secondary:hover {
+            background: #0f172a;
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.16);
+        }
+
+        .hero-stats-row {
+            display: none;
+        }
+
+        .hero-features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 56rem;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 3rem;
+        }
+
+        .hero-feature-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.75rem 1.5rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .hero-feature-card:hover {
+            background: rgba(255, 255, 255, 0.65);
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-4px);
+        }
+
+        .hero-feature-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .hero-feature-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .hero-feature-card p {
+            font-size: 0.9rem;
+            color: #526071;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .hero-stat-card {
+            padding: 0.9rem 1rem;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .hero-floating-badges {
+            position: absolute;
+            top: 0.8rem;
+            left: 0;
+            right: 0;
+            bottom: auto;
+            z-index: 6;
+            width: min(calc(100% - 2rem), 76rem);
+            margin: 0 auto;
+            height: 12.5rem;
+            padding: 0 0.8rem;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .hero-floating-badge {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.62rem;
+            padding: 0.76rem 1rem;
+            border-radius: 999px;
+            background: rgba(2, 6, 23, 0.78);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 16px 36px rgba(2, 6, 23, 0.24);
+            color: #f8fafc;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+            pointer-events: auto;
+            will-change: transform;
+        }
+
+        .hero-floating-badge:hover {
+            transform: translateY(-5px) scale(1.03);
+            background: #020617;
+            box-shadow: 0 24px 52px rgba(2, 6, 23, 0.34);
+        }
+
+        .hero-badge-top-left { top: 0.8rem; left: 7%; }
+        .hero-badge-top-mid { top: 0.1rem; left: 50%; transform: translateX(-50%); }
+        .hero-badge-top-right { top: 0.9rem; right: 7%; }
+        .hero-badge-mid-left { top: 4.8rem; left: 4%; }
+        .hero-badge-mid-right { top: 4.8rem; right: 4%; }
+        .hero-badge-bottom-left { top: 9.1rem; left: 8%; }
+        .hero-badge-bottom-mid { top: 9.7rem; left: 50%; transform: translateX(-50%); }
+        .hero-badge-bottom-right { top: 9.2rem; right: 8%; }
+
+        .hero-lane-stack {
+            position: relative;
+            width: 100%;
+            z-index: 2;
+            margin-top: 6rem;
+            padding-bottom: 0.8rem;
+            opacity: 0;
+            transform: translateY(140px);
+        }
+
+        .hero-lane {
+            position: relative;
+            left: -8%;
+            right: -8%;
+            z-index: 1;
+            overflow: visible;
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .hero-lane-top { margin-top: 0; }
+        .hero-lane-bottom { margin-top: 1.2rem; }
+
+        .hero-lane-track {
+            display: flex;
+            gap: 1rem;
+            width: max-content;
+        }
+
+        .hero-lane-track--right {
+            animation: heroLaneRight 58s linear infinite;
+        }
+
+        .hero-lane-track--left {
+            animation: heroLaneLeft 66s linear infinite;
+        }
+
+        @keyframes heroLaneRight {
+            from { transform: translateX(-20%); }
+            to { transform: translateX(0%); }
+        }
+
+        @keyframes heroLaneLeft {
+            from { transform: translateX(0%); }
+            to { transform: translateX(-20%); }
+        }
+
+        .hero-lane-card {
+            position: relative;
+            flex: 0 0 auto;
+            width: clamp(10.5rem, 12.5vw, 13.6rem);
+            aspect-ratio: 4 / 5;
+            overflow: hidden;
+            border-radius: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.26);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+            background: rgba(8, 15, 31, 0.48);
+            text-decoration: none;
+            color: #f8fafc;
+            pointer-events: auto;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
+        }
+
+        .hero-lane-card:hover {
+            transform: translateY(-8px) scale(1.025);
+            box-shadow: 0 34px 84px rgba(2, 6, 23, 0.34);
+        }
+
+        .hero-lane-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) saturate(0.98) contrast(1.08);
+            transform: scale(1.07);
+            transition: transform 0.55s ease;
+        }
+
+        .hero-lane-card:hover img {
+            transform: scale(1.13);
+        }
+
+        .hero-lane-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8, 15, 31, 0.1) 18%, rgba(8, 15, 31, 0.84) 100%);
+        }
+
+        .hero-lane-copy {
+            position: absolute;
+            inset: auto 0.95rem 0.95rem 0.95rem;
+            z-index: 2;
+        }
+
+        .hero-lane-copy p {
+            margin: 0.35rem 0 0;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 0.78rem;
+            line-height: 1.5;
+        }
+
+        .hero-pop-card {
+            position: absolute;
+            left: calc(100% + 1.25rem);
+            top: 50%;
+            bottom: auto;
+            z-index: 8;
+            width: min(100%, 21.5rem);
+            padding: 1rem 1.05rem;
+            border-radius: 24px;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 20px 50px rgba(2, 6, 23, 0.24);
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            color: #f8fafc;
+            transform: translateY(calc(-50% + 8px));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.24s ease, transform 0.24s ease;
+        }
+
+        .hero-pop-card.hidden { display: none; }
+
+        .hero-pop-card.is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%);
+            will-change: opacity;
+        }
+
+        .hero-pop-card p {
+            margin: 0.75rem 0 0;
+            color: #cbd5e1;
+            line-height: 1.7;
+            pointer-events: none;
+        }
+
+        .hero-pop-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .hero-pop-close {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(255, 255, 255, 0.04);
+            color: #f8fafc;
+        }
+
+        @media (max-width: 1100px) {
+            .hero-stage {
+                padding-top: 5.4rem;
+            }
+
+            .hero-copy-wrap {
+                width: min(100%, 44rem);
+                margin-top: 6.2rem;
+            }
+
+            .hero-lane-stack {
+                margin-top: 4rem;
+            }
+
+            .hero-badge-top-left,
+            .hero-badge-top-right,
+            .hero-badge-mid-left,
+            .hero-badge-mid-right,
+            .hero-badge-bottom-left,
+            .hero-badge-bottom-mid,
+            .hero-badge-bottom-right {
+                display: none;
+            }
+
+            .hero-grid {
+                min-height: calc(100svh - 8rem);
+            }
+
+            .hero-pop-card {
+                left: 50%;
+                top: calc(100% + 0.8rem);
+                width: min(100%, 24rem);
+                transform: translateX(-50%) translateY(8px);
+            }
+
+            .hero-pop-card.is-open {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .hero-stage {
+                padding-top: 4.9rem;
+                padding-bottom: 2rem;
+            }
+
+            .hero-grid {
+                min-height: calc(100svh - 7.4rem);
+                justify-content: flex-start;
+            }
+
+            .hero-copy-wrap {
+                width: 100%;
+                min-height: 0;
+                margin-top: 1.8rem;
+                padding: 0 0.5rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2.9rem, 15vw, 4.8rem);
+            }
+
+            .hero-subtitle {
+                max-width: 30rem;
+                font-size: 0.98rem;
+                line-height: 1.62;
+            }
+
+            .hero-floating-badges {
+                position: static;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.75rem;
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                margin-bottom: 1rem;
+            }
+
+            .hero-floating-badge {
+                position: static;
+                transform: none !important;
+            }
+
+            .hero-lane-stack {
+                position: relative;
+                margin-top: 3.5rem;
+                transform: none;
+                opacity: 1;
+            }
+
+            .hero-lane {
+                position: relative;
+                left: auto;
+                right: auto;
+                margin-bottom: 1rem;
+                opacity: 1;
+            }
+
+            .hero-lane-bottom {
+                margin-top: 1rem;
+                margin-bottom: 1.2rem;
+            }
+
+            .hero-lane-card {
+                width: 10.4rem;
+            }
+
+            .hero-stats-row {
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+
+            .hero-pop-card {
+                position: static;
+                left: 50%;
+                right: auto;
+                bottom: auto;
+                top: auto;
+                width: min(100%, 22rem);
+                margin-top: 0.75rem;
+                transform: none;
+            }
+
+            .hero-pop-card.is-open {
+                transform: none;
+            }
+        }
+
+        /* Collage hero overrides */
+        .hero-stage {
+            padding: 6.1rem 0 2.8rem;
+        }
+
+        .hero-grid {
+            min-height: min(46rem, calc(100svh - 7.2rem));
+            position: relative;
+            display: grid;
+            place-items: center;
+        }
+
+        .hero-copy-wrap {
+            margin-top: 0;
+            width: min(100%, 52rem);
+            z-index: 8;
+            pointer-events: none;
+        }
+
+        .hero-copy-shell,
+        .hero-pop-card,
+        .hero-action-row {
+            pointer-events: auto;
+        }
+
+        .hero-center-kicker {
+            background: rgba(255, 255, 255, 0.72);
+            color: #7c8da4;
+            border-color: rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+            letter-spacing: 0.16em;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            max-width: 9.8ch;
+            line-height: 0.92;
+            font-size: clamp(3.4rem, 8.8vw, 6.1rem);
+        }
+
+        .hero-subtitle {
+            max-width: 44rem;
+            color: #4f6078;
+            font-size: clamp(1rem, 1.75vw, 1.24rem);
+            line-height: 1.66;
+            background: rgba(255, 255, 255, 0.38);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 999px;
+            padding: 0.55rem 1.1rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .hero-collage {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .hero-collage-card {
+            position: absolute;
+            width: clamp(7.2rem, 11.2vw, 11.2rem);
+            aspect-ratio: 4 / 5;
+            border: 0;
+            padding: 0;
+            border-radius: 0.35rem;
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.26);
+            background: #dbe4ef;
+            overflow: hidden;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: box-shadow 0.22s ease, filter 0.22s ease;
+            will-change: transform;
+        }
+
+        .hero-collage-card:hover {
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.34);
+            filter: saturate(1.05);
+        }
+
+        .hero-collage-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-collage-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0) 28%, rgba(15, 23, 42, 0.32) 100%);
+            pointer-events: none;
+        }
+
+        .hero-collage-card::after {
+            content: attr(data-series);
+            position: absolute;
+            left: 0.48rem;
+            bottom: 0.42rem;
+            font-size: 0.58rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.88);
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .hero-slot-1 { left: 1.6%; top: 6%; }
+        .hero-slot-2 { left: 11.5%; top: 24%; width: clamp(6.2rem, 9.5vw, 9.6rem); }
+        .hero-slot-3 { left: 3%; top: 56%; width: clamp(8rem, 12.5vw, 12rem); }
+        .hero-slot-4 { right: 5%; top: 4%; width: clamp(7rem, 10.8vw, 10.4rem); aspect-ratio: 16 / 10; }
+        .hero-slot-5 { right: 1%; top: 39%; width: clamp(7.8rem, 11.8vw, 11.1rem); }
+        .hero-slot-6 { right: 16.5%; top: 52%; width: clamp(6.8rem, 10vw, 9.8rem); }
+        .hero-slot-7 { right: 8.5%; top: 73%; width: clamp(8.2rem, 12.5vw, 12rem); aspect-ratio: 16 / 10; }
+
+        .hero-pop-card {
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 0.9rem);
+            width: min(96vw, 30rem);
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(8, 17, 31, 0.96);
+        }
+
+        .hero-pop-card.is-open {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .hero-pop-header {
+            display: grid;
+            grid-template-columns: 84px minmax(0, 1fr);
+            gap: 0.85rem;
+            align-items: start;
+        }
+
+        .hero-pop-header img {
+            width: 84px;
+            height: 106px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+
+        .hero-pop-actions {
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 760px) {
+            .hero-stage {
+                padding-top: 5rem;
+            }
+
+            .hero-subtitle {
+                border-radius: 20px;
+            }
+
+            .hero-collage {
+                opacity: 0.88;
+            }
+
+            .hero-slot-2,
+            .hero-slot-6,
+            .hero-slot-7 {
+                display: none;
+            }
+
+            .hero-slot-1 { left: 1%; top: 10%; }
+            .hero-slot-3 { left: 1%; top: 62%; }
+            .hero-slot-4 { right: 1%; top: 8%; }
+            .hero-slot-5 { right: 1%; top: 50%; }
+        }
+    </style>
+</head>
+<body data-page="story" class="text-slate-900 antialiased">
+    <div class="offers-bar">
+        <div class="offers-track" id="offers-track">
+            <span class="offer-item">Free prepaid shipping</span>
+            <span class="offer-item"><span class="sep">*</span></span>
+            <span class="offer-item">Poster vault drops live</span>
+            <span class="offer-item"><span class="sep">*</span></span>
+            <span class="offer-item">Desk merch and manga in store</span>
+            <span class="offer-item"><span class="sep">*</span></span>
+            <span class="offer-item">Free prepaid shipping</span>
+            <span class="offer-item"><span class="sep">*</span></span>
+            <span class="offer-item">Poster vault drops live</span>
+            <span class="offer-item"><span class="sep">*</span></span>
+            <span class="offer-item">Desk merch and manga in store</span>
+        </div>
+    </div>
+
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-14 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <button class="icon-btn relative" type="button" data-cart-toggle aria-label="Open cart">
+                    <i class="fas fa-bag-shopping"></i>
+                    <span id="cart-count" class="absolute -right-1 -top-1 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <div id="cart-backdrop" class="cart-backdrop"></div>
+    <aside id="cart-panel" class="cart-panel">
+        <div class="h-full bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <div class="section-kicker">Cart</div>
+                    <h2 class="font-display text-2xl font-bold mt-3 tracking-[-0.05em]">Your setup bag</h2>
+                </div>
+                <button type="button" class="icon-btn" data-cart-close aria-label="Close cart"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+            <div class="smoke-card p-4">
+                <div class="flex items-center justify-between text-sm font-bold text-slate-500 uppercase tracking-[0.16em]">
+                    <span>Subtotal</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <a href="checkout.html" class="action-btn w-full mt-4">Checkout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <section class="hero-stage" id="hero-stage">
+            <div class="site-shell hero-grid">
+                <div class="hero-copy-wrap reveal">
+                    <div class="hero-copy-shell">
+                        <div class="hero-center-kicker">The Digital Archivist</div>
+                        <h1 class="hero-title" id="hero-title">Find your <span class="gradient-text">Poster Aesthetic</span></h1>
+                        <p class="hero-subtitle" id="hero-subtitle">A curated collection of digital artifacts, meticulously archived for the modern space. From shonen legends to high-octane engineering.</p>
+                        <div class="hero-action-row">
+                            <a href="collections.html" class="action-btn">Explore Poster Vault</a>
+                            <a href="about.html" class="action-btn secondary">Our Story</a>
+                        </div>
+                    </div>
+
+                    <div id="hero-pop-card" class="hero-pop-card hidden" aria-live="polite">
+                        <div class="hero-pop-header">
+                            <img id="hero-pop-image" src="" alt="Selected poster" loading="lazy">
+                            <div>
+                                <div id="hero-pop-series" class="pill !bg-white/12 !text-slate-100 !border-white/20">Series</div>
+                                <h2 id="hero-pop-title" class="font-display text-2xl font-bold mt-3 tracking-[-0.05em]">Poster title</h2>
+                                <div id="hero-pop-price" class="font-display text-xl font-bold mt-2 tracking-[-0.04em]">$0.00</div>
+                            </div>
+                        </div>
+                        <p id="hero-pop-copy">Tap any floating card to view details and add it to your cart.</p>
+                        <div class="hero-pop-actions">
+                            <button id="hero-pop-add" type="button" class="action-btn !py-3 !px-4">Add to cart</button>
+                            <button id="hero-pop-buy" type="button" class="action-btn secondary !py-3 !px-4">Buy now</button>
+                            <button id="hero-pop-close" type="button" class="hero-pop-close" aria-label="Close preview panel"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hero-collage" class="hero-collage" aria-label="Featured posters from gallery"></div>
+            </div>
+        </section>
+        <section id="story" class="py-10 md:py-16">
+            <div class="site-shell">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6 reveal">
+                    <div>
+                        <div class="section-kicker">Project story flow</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">No blank pinning. Just strong motion, clean reads, and product-first clicks.</h2>
+                    </div>
+                    <p class="max-w-xl text-slate-500 text-lg">The homepage stays the story landing page while Poster Vault, Discover, Store, and Help Center each open their own page from the same menu.</p>
+                </div>
+                <div class="story-grid">
+                    <article class="smoke-card p-5 reveal">
+                        <div class="pill">1</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Poster vault stays pure.</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Only posters show here. Four cards on the homepage. Full expansion lives on the Poster Vault page.</p>
+                    </article>
+                    <article class="smoke-card p-5 reveal">
+                        <div class="pill">2</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Store stays merch-only.</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Manga, bottles, bags, tees, keychains, and room extras get their own flow without mixing back into poster browsing.</p>
+                    </article>
+                    <article class="smoke-card p-5 reveal">
+                        <div class="pill">3</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Each card opens a product page.</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Cards are clickable, hover with a smoky lift, and route into a styled product detail page instead of dead-end static tiles.</p>
+                    </article>
+                    <article class="smoke-card p-5 reveal">
+                        <div class="pill">4</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Admin feeds everything.</h3>
+                        <p class="text-slate-500 mt-3 leading-7">The same catalog powers homepage previews, discover, store, and product pages so the admin panel actually matters.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="poster-vault" class="py-10 md:py-16">
+            <div class="site-shell">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6 reveal">
+                    <div>
+                        <div class="section-kicker">Poster vault</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Four posters up front. <span class="gradient-text">More in Poster Vault.</span></h2>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="discover.html" class="action-btn">Open poster vault</a>
+                        <a href="product.html?slug=naruto-sage-mode-skyline" class="action-btn secondary">Open featured poster</a>
+                    </div>
+                </div>
+                <div class="preview-grid" id="poster-preview"></div>
+            </div>
+        </section>
+        <section class="py-10 md:py-16">
+            <div class="site-shell">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6 reveal">
+                    <div>
+                        <div class="section-kicker">Store preview</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Four merch drops only. <span class="gradient-text">No posters mixed in.</span></h2>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="store.html" class="action-btn">Open store</a>
+                        <a href="help-center.html" class="action-btn secondary">Need help choosing?</a>
+                    </div>
+                </div>
+                <div class="preview-grid" id="store-preview"></div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-16">
+            <div class="site-shell">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6 reveal">
+                    <div>
+                        <div class="section-kicker">Discover jumps</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Jump by vibe, then click into the exact product.</h2>
+                    </div>
+                    <p class="max-w-xl text-slate-500 text-lg">Big image links for Naruto, One Piece, JJK, and Solo Leveling give the site that stronger Gen Z browse energy without hiding content when you scroll back up.</p>
+                </div>
+                <div class="jump-grid">
+                    <a class="jump-card reveal tilt-card" href="discover.html?series=Naruto">
+                        <img src="images/naruto3.jpg" alt="Naruto posters">
+                        <div class="jump-copy">
+                            <div class="section-kicker !bg-white/15 !text-white !border-white/15">Naruto</div>
+                            <h3 class="font-display text-3xl font-bold mt-4 tracking-[-0.05em]">Best poster energy</h3>
+                            <p class="text-white/80 mt-2">Legacy walls, orange light, and Hidden Leaf heat.</p>
+                        </div>
+                    </a>
+                    <a class="jump-card reveal tilt-card" href="discover.html?series=One%20Piece">
+                        <img src="images/One%20Piece2.jpg" alt="One Piece posters">
+                        <div class="jump-copy">
+                            <div class="section-kicker !bg-white/15 !text-white !border-white/15">One Piece</div>
+                            <h3 class="font-display text-3xl font-bold mt-4 tracking-[-0.05em]">Skybreak pirate walls</h3>
+                            <p class="text-white/80 mt-2">Gear 5 motion and crew-shot collector drops.</p>
+                        </div>
+                    </a>
+                    <a class="jump-card reveal tilt-card" href="discover.html?series=Jujutsu%20Kaisen">
+                        <img src="images/gojo%20.jpg" alt="Jujutsu Kaisen posters">
+                        <div class="jump-copy">
+                            <div class="section-kicker !bg-white/15 !text-white !border-white/15">JJK</div>
+                            <h3 class="font-display text-3xl font-bold mt-4 tracking-[-0.05em]">Blue glare room flex</h3>
+                            <p class="text-white/80 mt-2">Gojo glow, darker curse tones, sharper contrast.</p>
+                        </div>
+                    </a>
+                    <a class="jump-card reveal tilt-card" href="discover.html?series=Solo%20Leveling">
+                        <img src="images/solo-leveling-2.jpg" alt="Solo Leveling posters">
+                        <div class="jump-copy">
+                            <div class="section-kicker !bg-white/15 !text-white !border-white/15">Solo Leveling</div>
+                            <h3 class="font-display text-3xl font-bold mt-4 tracking-[-0.05em]">Shadow room story</h3>
+                            <p class="text-white/80 mt-2">Poster and merch flows for moody setup builders.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-16">
+            <div class="site-shell">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-6 reveal">
+                    <div>
+                        <div class="section-kicker">Community wall</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Real rooms keep the story grounded.</h2>
+                    </div>
+                    <a href="help-center.html" class="action-btn secondary">Open help center</a>
+                </div>
+                <div class="wall-grid" id="customer-wall">
+                    <div class="wall-photo reveal"><img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=600&fit=crop" alt="Room setup"></div>
+                    <div class="wall-photo reveal"><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&fit=crop" alt="Room setup"></div>
+                    <div class="wall-photo reveal"><img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=600&fit=crop" alt="Room setup"></div>
+                    <div class="wall-photo reveal"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=600&fit=crop" alt="Room setup"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-16">
+            <div class="site-shell smoke-card p-6 md:p-8 reveal">
+                <div class="grid grid-cols-1 lg:grid-cols-[1.25fr_0.75fr] gap-6 items-start">
+                    <div>
+                        <div class="section-kicker">Help center</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Need the clean answer fast?</h2>
+                        <p class="text-slate-500 text-lg leading-8 mt-4 max-w-2xl">Support is now structured like a real service hub. Use one path for order updates, one for policy answers, and one for direct help without digging through unrelated pages.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 text-sm">
+                            <div class="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3">
+                                <div class="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Response</div>
+                                <div class="font-display text-xl font-bold tracking-[-0.04em] text-slate-900 mt-1">Within 24h</div>
+                            </div>
+                            <div class="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3">
+                                <div class="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Shipping Help</div>
+                                <div class="font-display text-xl font-bold tracking-[-0.04em] text-slate-900 mt-1">India Wide</div>
+                            </div>
+                            <div class="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3">
+                                <div class="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Answers</div>
+                                <div class="font-display text-xl font-bold tracking-[-0.04em] text-slate-900 mt-1">FAQ + Terms</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <a href="help-center.html" class="action-btn">Open help center</a>
+                            <a href="contact.html" class="action-btn secondary">Contact support</a>
+                            <a href="shipping.html" class="action-btn secondary">Track shipping help</a>
+                        </div>
+                    </div>
+                    <div class="help-grid help-grid-square">
+                        <a href="faq.html" class="help-card">
+                            <div class="pill">FAQ</div>
+                            <h3 class="help-title font-display font-bold tracking-[-0.04em]">Quick answers</h3>
+                            <p class="help-copy">Paper quality, frame choices, dispatch timing, and return basics in one place.</p>
+                        </a>
+                        <a href="shipping.html" class="help-card">
+                            <div class="pill">Shipping</div>
+                            <h3 class="help-title font-display font-bold tracking-[-0.04em]">Delivery info</h3>
+                            <p class="help-copy">Delivery windows, prepaid options, delays, and replacement policy details.</p>
+                        </a>
+                        <a href="terms.html" class="help-card">
+                            <div class="pill">Policy</div>
+                            <h3 class="help-title font-display font-bold tracking-[-0.04em]">Terms and rules</h3>
+                            <p class="help-copy">Read billing, cancellation, and order terms before checkout.</p>
+                        </a>
+                        <a href="about.html" class="help-card">
+                            <div class="pill">Brand</div>
+                            <h3 class="help-title font-display font-bold tracking-[-0.04em]">About the project</h3>
+                            <p class="help-copy">Understand the story, quality promise, and catalog direction.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 md:py-16">
+        <div class="site-shell smoke-card p-6 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="font-display text-3xl font-bold tracking-[-0.08em]">BUREAU.</div>
+                    <p class="text-slate-500 mt-4 max-w-xl">Story-led poster project site with a poster-only vault, merch-only store, live admin catalog, and cleaner product routes.</p>
+                </div>
+                <div>
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Browse</div>
+                    <div class="grid gap-3 mt-4 text-sm font-bold">
+                        <a href="discover.html" class="footer-link">Discover</a>
+                        <a href="collections.html" class="footer-link">Poster vault</a>
+                        <a href="store.html" class="footer-link">Store</a>
+                        <a href="product.html?slug=naruto-sage-mode-skyline" class="footer-link">Featured product</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Support</div>
+                    <div class="grid gap-3 mt-4 text-sm font-bold">
+                        <a href="help-center.html" class="footer-link">Help center</a>
+                        <a href="contact.html" class="footer-link">Contact</a>
+                        <a href="faq.html" class="footer-link">FAQs</a>
+                        <a href="shipping.html" class="footer-link">Shipping</a>
+                        <a href="terms.html" class="footer-link">Terms</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="catalog.js"></script>
+    <script src="storefront.js"></script>
+    <script src="site-content.js"></script>
+    <script src="auth-nav.js"></script>
+    <script>
+        const cardTemplate = (item) => {
+            const mediaMarkup = item.kind === 'poster'
+                ? `<div class="showcase-mock"><div class="showcase-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div></div>`
+                : `<div class="showcase-mock no-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div>`;
+
+            return `
+            <article class="smoke-card catalog-card showcase-card reveal" style="--accent:${item.accentHex};">
+                <a href="${window.BureauCatalog.buildProductUrl(item)}" class="catalog-thumb">
+                    <span class="showcase-sale">Sale</span>
+                    ${mediaMarkup}
+                    <div class="catalog-badge pill" style="background:rgba(255,255,255,0.88);">${item.series}</div>
+                </a>
+                <div class="catalog-meta">
+                    <div>
+                        <div class="catalog-meta-top"><div class="catalog-icon-pill"><i class="fa-solid ${window.BureauUI.itemIconClass(item)}"></i><span>${item.type}</span></div><div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">${item.highlight}</div></div>
+                        <h3 class="catalog-title mt-4">${item.title}</h3>
+                        <p class="catalog-copy mt-3">${item.subtitle}</p>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 mt-5">
+                        <div>
+                            <div class="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Price</div>
+                            <div class="font-display text-2xl font-bold tracking-[-0.05em]">${window.BureauCatalog.money(item.price)}</div>
+                        </div>
+                        <a href="${window.BureauCatalog.buildProductUrl(item)}" class="action-btn !py-3 !px-4">Open</a>
+                    </div>
+                </div>
+            </article>
+        `;
+        };
+
+        function applyAddButtons(host, bySlug, cart) {
+            host.querySelectorAll('[data-add-cart]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const item = bySlug.get(button.getAttribute('data-add-cart'));
+                    if (!item) return;
+                    cart.add(item, { open: false });
+                });
+            });
+        }
+
+        function heroCollageCard(item, slotClass, depth, angle) {
+            return `
+                <button
+                    type="button"
+                    class="hero-collage-card ${slotClass}"
+                    data-hero-slug="${item.slug}"
+                    data-depth="${depth}"
+                    data-angle="${angle}"
+                    data-series="${item.series || item.type || 'Poster'}"
+                    aria-label="Preview ${item.title}"
+                >
+                    <img src="${item.image_url}" alt="${item.title}" loading="lazy">
+                </button>
+            `;
+        }
+
+        function showHeroPop(payload) {
+            const card = document.getElementById('hero-pop-card');
+            if (!card) return;
+            const title = document.getElementById('hero-pop-title');
+            const copy = document.getElementById('hero-pop-copy');
+            const image = document.getElementById('hero-pop-image');
+            const series = document.getElementById('hero-pop-series');
+            const price = document.getElementById('hero-pop-price');
+            if (title) title.textContent = payload.title || 'Quick details';
+            if (copy) copy.textContent = payload.copy || 'Open the full page for the full product view.';
+            if (image) {
+                image.src = payload.image || '';
+                image.alt = payload.title || 'Selected item';
+            }
+            if (series) series.textContent = payload.series || 'Poster';
+            if (price) price.textContent = payload.price || '';
+            card.classList.remove('hidden');
+            requestAnimationFrame(() => card.classList.add('is-open'));
+        }
+
+        function hideHeroPop() {
+            const card = document.getElementById('hero-pop-card');
+            if (!card || card.classList.contains('hidden')) return;
+            card.classList.remove('is-open');
+            setTimeout(() => card.classList.add('hidden'), 220);
+        }
+
+        function bindHeroPopovers(bySlug, cart) {
+            const stage = document.getElementById('hero-stage');
+            const close = document.getElementById('hero-pop-close');
+            const card = document.getElementById('hero-pop-card');
+            const addBtn = document.getElementById('hero-pop-add');
+            const buyBtn = document.getElementById('hero-pop-buy');
+            if (!stage || !card || !close) return;
+
+            let activeItem = null;
+
+            stage.querySelectorAll('.hero-collage-card[data-hero-slug]').forEach((node) => {
+                const openPreview = () => {
+                    const item = bySlug.get(node.getAttribute('data-hero-slug') || '');
+                    if (!item) return;
+                    activeItem = item;
+                    showHeroPop({
+                        title: item.title,
+                        copy: item.description || item.subtitle || item.highlight || 'Premium gallery drop ready for your wall.',
+                        image: item.image_url,
+                        series: item.series || item.type || 'Poster',
+                        price: window.BureauCatalog.money(item.price)
+                    });
+                };
+
+                node.addEventListener('click', openPreview);
+            });
+
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    if (!activeItem || !cart) return;
+                    cart.add(activeItem, { open: true });
+                });
+            }
+
+            if (buyBtn) {
+                buyBtn.addEventListener('click', () => {
+                    if (!activeItem) return;
+                    window.BureauCatalog.writeCart([activeItem]);
+                    window.location.href = 'checkout.html';
+                });
+            }
+
+            close.addEventListener('click', hideHeroPop);
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') hideHeroPop();
+            });
+
+            stage.addEventListener('click', (event) => {
+                if (!card.contains(event.target) && !event.target.closest('.hero-collage-card')) {
+                    hideHeroPop();
+                }
+            });
+        }
+
+        function bindHeroLaneNavigation() {
+            // Replaced by collage click popovers.
+        }
+
+        function bindHeroMouseParallax() {
+            const stage = document.getElementById('hero-stage');
+            const panel = document.querySelector('.hero-copy-wrap');
+            const title = document.getElementById('hero-title');
+            const subtitle = document.getElementById('hero-subtitle');
+            const cards = Array.from(stage ? stage.querySelectorAll('.hero-collage-card[data-depth]') : []);
+            if (!stage || !panel || !title || !subtitle || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            let pointerX = 0;
+            let pointerY = 0;
+            let raf = 0;
+
+            const tick = () => {
+                const time = Date.now() / 1000;
+                cards.forEach((card, index) => {
+                    const depth = Number(card.getAttribute('data-depth') || 1);
+                    const baseAngle = Number(card.getAttribute('data-angle') || 0);
+                    const floatY = Math.sin(time * (0.78 + (index % 3) * 0.13) + index) * (3.6 * depth);
+                    const floatX = Math.cos(time * (0.58 + (index % 2) * 0.1) + index * 0.6) * (2.4 * depth);
+                    const moveX = pointerX * (12 * depth) + floatX;
+                    const moveY = pointerY * (9 * depth) + floatY;
+                    card.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0) rotate(${baseAngle}deg)`;
+                });
+                raf = window.requestAnimationFrame(tick);
+            };
+            raf = window.requestAnimationFrame(tick);
+
+            stage.addEventListener('pointermove', (event) => {
+                const bounds = stage.getBoundingClientRect();
+                const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+                const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+                pointerX = x;
+                pointerY = y;
+                title.style.transform = `translate3d(${x * 18}px, ${y * 14}px, 0)`;
+                subtitle.style.transform = `translate3d(${x * 10}px, ${y * 8}px, 0)`;
+                panel.style.transform = '';
+            });
+
+            stage.addEventListener('pointerleave', () => {
+                pointerX = 0;
+                pointerY = 0;
+                panel.style.transform = '';
+                title.style.transform = '';
+                subtitle.style.transform = '';
+            });
+
+            stage.addEventListener('remove', () => {
+                if (raf) window.cancelAnimationFrame(raf);
+            });
+        }
+
+        function mountHeroBadgeMotion() {
+            // Badge motion disabled - badges now stay in fixed positions
+            // This prevents the confusing orbit animation that was making text float with cursor
+            return;
+        }
+
+        function renderHero(posters, products, bySlug, cart) {
+            const collage = document.getElementById('hero-collage');
+            if (!collage) return;
+
+            const picks = [...posters.slice(0, 7)];
+            if (picks.length < 7) {
+                picks.push(...products.slice(0, 7 - picks.length));
+            }
+
+            const slots = [
+                { klass: 'hero-slot-1', depth: 1.15, angle: -2.2 },
+                { klass: 'hero-slot-2', depth: 0.82, angle: 10.8 },
+                { klass: 'hero-slot-3', depth: 1.28, angle: 4.2 },
+                { klass: 'hero-slot-4', depth: 0.94, angle: 5.4 },
+                { klass: 'hero-slot-5', depth: 1.04, angle: -3.8 },
+                { klass: 'hero-slot-6', depth: 0.88, angle: -11.8 },
+                { klass: 'hero-slot-7', depth: 1.1, angle: -2.6 }
+            ];
+
+            collage.innerHTML = picks.map((item, index) => {
+                const slot = slots[index % slots.length];
+                return heroCollageCard(item, slot.klass, slot.depth, slot.angle);
+            }).join('');
+
+            bindHeroPopovers(bySlug, cart);
+            bindHeroMouseParallax();
+            mountHeroBadgeMotion();
+        }
+
+        function initMotion() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.reveal').forEach((node) => { node.style.opacity = '1'; node.style.transform = 'none'; });
+                return;
+            }
+
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.reveal').forEach((node) => {
+                gsap.to(node, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', scrollTrigger: { trigger: node, start: 'top 88%', once: true } });
+            });
+
+            gsap.fromTo('.hero-copy-wrap', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' });
+            gsap.to('.hero-copy-wrap', { y: -12, scrollTrigger: { trigger: '.hero-stage', start: 'top top', end: 'bottom top', scrub: 0.45 } });
+            gsap.fromTo('.hero-collage-card',
+                { y: 30, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    stagger: 0.05,
+                    ease: 'power2.out',
+                    scrollTrigger: { trigger: '.hero-stage', start: 'top 78%', once: true }
+                }
+            );
+
+            gsap.utils.toArray('.story-grid .smoke-card').forEach((card, index) => {
+                gsap.fromTo(card,
+                    {
+                        opacity: 0,
+                        y: 90,
+                        rotationX: 14,
+                        z: -120,
+                        transformPerspective: 1200,
+                        transformOrigin: 'center top'
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        rotationX: 0,
+                        z: 0,
+                        duration: 1.05,
+                        ease: 'power3.out',
+                        delay: index * 0.04,
+                        scrollTrigger: {
+                            trigger: card,
+                            start: 'top 84%',
+                            end: 'top 56%',
+                            scrub: 0.25
+                        }
+                    }
+                );
+            });
+
+            gsap.fromTo('.jump-card',
+                { y: 72, rotationY: 8, opacity: 0.6, transformPerspective: 1400 },
+                {
+                    y: 0,
+                    rotationY: 0,
+                    opacity: 1,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '.jump-grid',
+                        start: 'top 86%',
+                        end: 'top 54%',
+                        scrub: 0.35
+                    }
+                }
+            );
+        }
+
+        async function boot() {
+            window.BureauUI.hydrateNavigation({ current: 'story' });
+            window.BureauUI.mountMobileMenu();
+            const cart = window.BureauUI.mountCart();
+            const items = await window.BureauCatalog.fetchCatalog();
+            const posters = window.BureauCatalog.getPosters(items);
+            const products = window.BureauCatalog.getProducts(items);
+            const bySlug = new Map(items.map((item) => [item.slug, item]));
+
+            const posterCount = document.getElementById('poster-count');
+            const productCount = document.getElementById('product-count');
+            if (posterCount) posterCount.textContent = posters.length;
+            if (productCount) productCount.textContent = products.length;
+            renderHero(posters, products, bySlug, cart);
+
+            const posterPreview = document.getElementById('poster-preview');
+            posterPreview.innerHTML = posters.slice(0, 4).map(cardTemplate).join('');
+            applyAddButtons(posterPreview, bySlug, cart);
+
+            const storePreview = document.getElementById('store-preview');
+            storePreview.innerHTML = products.slice(0, 4).map(cardTemplate).join('');
+            applyAddButtons(storePreview, bySlug, cart);
+
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        }
+
+        window.addEventListener('DOMContentLoaded', boot);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1010 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU Admin | Live catalog studio</title>
+    <meta name="theme-color" content="#0f172a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+        body { font-family:'Manrope', sans-serif; background:linear-gradient(180deg, #08111f 0%, #111827 16%, #f8fafc 16%, #f8fafc 100%); color:#0f172a; }
+        .font-display { font-family:'Space Grotesk', sans-serif; }
+        .glass-panel { background:rgba(255,255,255,0.82); border:1px solid rgba(148,163,184,0.18); box-shadow:0 24px 70px rgba(15,23,42,0.1); backdrop-filter:blur(18px); }
+        .hero-glow { background:radial-gradient(circle at top left, rgba(249,115,22,0.22), transparent 28%), radial-gradient(circle at top right, rgba(79,70,229,0.24), transparent 28%), linear-gradient(135deg, #111827, #1f2937 45%, #0f172a); }
+        .field { width:100%; border:1px solid rgba(148,163,184,0.24); border-radius:18px; background:white; padding:0.9rem 1rem; outline:none; }
+        .field:focus { border-color:#4f46e5; box-shadow:0 0 0 4px rgba(79,70,229,0.1); }
+        .chip { display:inline-flex; align-items:center; gap:0.4rem; padding:0.32rem 0.72rem; border-radius:999px; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.12em; }
+        .btn-main { display:inline-flex; align-items:center; justify-content:center; gap:0.6rem; padding:0.85rem 1.1rem; border-radius:999px; background:#0f172a; color:white; font-weight:800; transition:all 0.2s ease; }
+        .btn-main:hover { background:#4f46e5; }
+        .btn-ghost { display:inline-flex; align-items:center; justify-content:center; gap:0.6rem; padding:0.85rem 1.1rem; border-radius:999px; background:white; color:#0f172a; border:1px solid rgba(148,163,184,0.22); font-weight:800; }
+        .modal-backdrop { background:rgba(8,17,31,0.56); backdrop-filter:blur(8px); }
+        .admin-page { display:none; }
+        .admin-page.is-active { display:block; }
+        .menu-pill.is-active { background:#0f172a; color:#fff; border-color:#0f172a; }
+        .table-pagination { display:flex; align-items:center; justify-content:flex-end; gap:0.45rem; padding:0.8rem 1rem 1rem; flex-wrap:wrap; }
+        .page-dot { min-width:2.2rem; border-radius:10px; border:1px solid rgba(148,163,184,0.35); background:#fff; padding:0.35rem 0.6rem; font-size:0.8rem; font-weight:800; color:#334155; }
+        .page-dot.is-active { background:#0f172a; color:#fff; border-color:#0f172a; }
+        .table-meta { font-size:0.82rem; font-weight:700; color:#64748b; }
+    </style>
+</head>
+<body>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
+        <div class="glass-panel rounded-[32px] w-full max-w-md p-8">
+            <div class="flex items-center justify-between mb-8">
+                <a href="index.html" class="font-display text-3xl font-bold tracking-[-0.08em]">BUREAU.</a>
+                <span class="chip bg-slate-900 text-white">Admin</span>
+            </div>
+            <h1 class="font-display text-4xl font-bold tracking-[-0.06em]">Catalog studio</h1>
+            <p class="text-slate-500 mt-3">Manage posters, merch, offers, photos, and user visibility from one panel.</p>
+            <form id="login-form" class="space-y-4 mt-8">
+                <div>
+                    <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Admin Email</label>
+                    <input id="login-email" class="field mt-2" autocomplete="username" placeholder="admin@gmail.com" value="admin@gmail.com">
+                </div>
+                <div>
+                    <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Password</label>
+                    <input id="login-password" type="password" class="field mt-2" autocomplete="current-password" value="admin123">
+                </div>
+                <div class="text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded-xl px-3 py-2">
+                    Default admin: admin@gmail.com / admin123
+                </div>
+                <button class="btn-main w-full" type="submit">Enter studio</button>
+                <div id="login-error" class="hidden text-sm text-rose-600 font-bold"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-app" class="hidden min-h-screen">
+        <header class="sticky top-0 z-50 px-4 md:px-6 py-4">
+            <div class="max-w-[1600px] mx-auto glass-panel rounded-[28px] px-5 md:px-6 py-4 flex items-center justify-between gap-4">
+                <div>
+                    <a href="index.html" class="font-display text-2xl md:text-3xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+                    <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400 mt-1">Live catalog studio</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="help-center.html" class="btn-ghost">Help center</a>
+                    <button id="new-btn" class="btn-main"><i class="fas fa-plus"></i> New item</button>
+                    <button id="logout-btn" class="btn-ghost"><i class="fas fa-right-from-bracket"></i> Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-[1600px] mx-auto px-4 md:px-6 pb-16 space-y-8">
+            <section class="glass-panel rounded-[24px] p-3 md:p-4 sticky top-[5.7rem] z-40">
+                <div class="flex flex-wrap gap-2 text-sm font-bold">
+                    <button type="button" class="btn-ghost !py-2 !px-4 menu-pill is-active" data-admin-page="dashboard">Dashboard</button>
+                    <button type="button" class="btn-ghost !py-2 !px-4 menu-pill" data-admin-page="catalog">Poster & Product</button>
+                    <button type="button" class="btn-ghost !py-2 !px-4 menu-pill" data-admin-page="community">Users & Media</button>
+                    <button type="button" class="btn-ghost !py-2 !px-4 menu-pill" data-admin-page="orders">Orders</button>
+                    <button type="button" class="btn-ghost !py-2 !px-4 menu-pill" data-admin-page="help">Help Pages</button>
+                </div>
+            </section>
+            <section id="menu-dashboard" data-admin-page="dashboard" class="admin-page is-active hero-glow rounded-[34px] text-white p-6 md:p-8 overflow-hidden relative">
+                <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-6 items-start">
+                    <div>
+                        <span class="chip bg-white/10 text-white border border-white/10">Admin + AI + live catalog</span>
+                        <h1 class="font-display text-4xl md:text-6xl font-bold tracking-[-0.07em] mt-5">A cooler admin panel for posters, merch, and story-driven storefront content.</h1>
+                        <p class="text-slate-300 text-lg leading-8 mt-5 max-w-3xl">Add poster-only items, merch-only items, highlights, series labels, materials, and featured flags. The homepage, discover page, store page, and product routes all pull from this same catalog.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="glass-panel rounded-[26px] p-5 text-slate-900">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Total items</div>
+                            <div id="stat-count" class="font-display text-4xl font-bold tracking-[-0.06em] mt-3">0</div>
+                        </div>
+                        <div class="glass-panel rounded-[26px] p-5 text-slate-900">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Posters</div>
+                            <div id="stat-posters" class="font-display text-4xl font-bold tracking-[-0.06em] mt-3">0</div>
+                        </div>
+                        <div class="glass-panel rounded-[26px] p-5 text-slate-900">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Merch</div>
+                            <div id="stat-products" class="font-display text-4xl font-bold tracking-[-0.06em] mt-3">0</div>
+                        </div>
+                        <div class="glass-panel rounded-[26px] p-5 text-slate-900 sm:col-span-2">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Node API</div>
+                            <div id="stat-api" class="font-display text-2xl font-bold tracking-[-0.05em] mt-3">Checking...</div>
+                        </div>
+                        <div class="glass-panel rounded-[26px] p-5 text-slate-900">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">AI</div>
+                            <div id="stat-ai" class="font-display text-2xl font-bold tracking-[-0.05em] mt-3">Checking...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="menu-catalog" data-admin-page="catalog" class="admin-page glass-panel rounded-[30px] overflow-hidden">
+                <div class="p-6 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Catalog items</h2>
+                        <p class="text-slate-500 mt-2">Poster vault and products are separated with filters, 12 rows per page.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+                        <input id="admin-search" class="field min-w-[280px]" placeholder="Search title, series, category...">
+                        <select id="kind-filter" class="field sm:min-w-[180px]">
+                            <option value="all">All items</option>
+                            <option value="poster">Poster only</option>
+                            <option value="product">Product only</option>
+                        </select>
+                        <button id="refresh-btn" class="btn-ghost">Refresh</button>
+                        <button id="reclassify-btn" class="btn-ghost">Auto classify all images</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-black tracking-[0.18em]">
+                            <tr>
+                                <th class="p-4">Item</th>
+                                <th class="p-4">Kind</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4">Series</th>
+                                <th class="p-4">Price</th>
+                                <th class="p-4">Stock</th>
+                                <th class="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="px-4 pt-3 table-meta" id="catalog-table-meta">Showing 0 items</div>
+                <div class="table-pagination" id="admin-table-pagination"></div>
+            </section>
+
+            <section data-admin-page="community" class="admin-page grid grid-cols-1 xl:grid-cols-[1fr_1fr] gap-8">
+                <div id="menu-users" class="glass-panel rounded-[30px] overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Registered users</h2>
+                            <p class="text-slate-500 mt-2">Who is in the system right now.</p>
+                        </div>
+                        <button id="refresh-users-btn" class="btn-ghost">Refresh</button>
+                    </div>
+                    <div class="px-6 py-4 text-sm font-bold text-slate-400" id="users-count">0 users</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-black tracking-[0.18em]">
+                                <tr>
+                                    <th class="p-4">User</th>
+                                    <th class="p-4">Email</th>
+                                    <th class="p-4">Joined</th>
+                                    <th class="p-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div id="menu-offers" class="glass-panel rounded-[30px] overflow-hidden">
+                        <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                            <div>
+                                <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Offers ticker</h2>
+                                <p class="text-slate-500 mt-2">Homepage motion copy from the admin side.</p>
+                            </div>
+                            <button id="add-offer-btn" class="btn-main">Add offer</button>
+                        </div>
+                        <div id="offers-list" class="p-6 space-y-3"></div>
+                    </div>
+
+                    <div id="menu-media" class="glass-panel rounded-[30px] overflow-hidden">
+                        <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                            <div>
+                                <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Community wall</h2>
+                                <p class="text-slate-500 mt-2">Customer setup photos shown on the homepage.</p>
+                            </div>
+                            <button id="add-photo-btn" class="btn-main">Add photo</button>
+                        </div>
+                        <div id="photos-grid" class="p-6 grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                    </div>
+                </div>
+            </section>
+
+                <section id="menu-orders" data-admin-page="orders" class="admin-page glass-panel rounded-[30px] overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Orders board</h2>
+                            <p class="text-slate-500 mt-2">Track payment method, payment state, and order status.</p>
+                        </div>
+                        <button id="refresh-orders-btn" class="btn-ghost">Refresh</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-black tracking-[0.18em]">
+                                <tr>
+                                    <th class="p-4">Order</th>
+                                    <th class="p-4">User</th>
+                                    <th class="p-4">Total</th>
+                                    <th class="p-4">Payment</th>
+                                    <th class="p-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="menu-help" data-admin-page="help" class="admin-page glass-panel rounded-[30px] overflow-hidden">
+                <div class="p-6 border-b border-slate-200">
+                    <h2 class="font-display text-3xl font-bold tracking-[-0.05em]">Help center pages</h2>
+                    <p class="text-slate-500 mt-2">Quick preview links for the support layer of the site.</p>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <a href="help-center.html" target="_blank" class="help-card"><div class="pill">Hub</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Help center</h3><p class="text-slate-500 mt-2">Central support landing page.</p></a>
+                    <a href="about.html" target="_blank" class="help-card"><div class="pill">About</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Brand story</h3><p class="text-slate-500 mt-2">Company and print-quality story.</p></a>
+                    <a href="contact.html" target="_blank" class="help-card"><div class="pill">Contact</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Contact</h3><p class="text-slate-500 mt-2">Direct support link.</p></a>
+                    <a href="faq.html" target="_blank" class="help-card"><div class="pill">FAQ</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">FAQs</h3><p class="text-slate-500 mt-2">Common customer questions.</p></a>
+                    <a href="shipping.html" target="_blank" class="help-card"><div class="pill">Shipping</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Shipping</h3><p class="text-slate-500 mt-2">Delivery and replacement info.</p></a>
+                    <a href="terms.html" target="_blank" class="help-card"><div class="pill">Terms</div><h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Terms</h3><p class="text-slate-500 mt-2">Policy and legal basics.</p></a>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="posterModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-[100] p-4">
+        <div class="glass-panel rounded-[32px] w-full max-w-3xl overflow-hidden">
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                <div>
+                    <div class="chip bg-slate-900 text-white">Create catalog item</div>
+                    <h2 class="font-display text-3xl font-bold tracking-[-0.05em] mt-3">Add or refresh a storefront item</h2>
+                </div>
+                <button id="modal-close" class="btn-ghost" type="button">Close</button>
+            </div>
+            <div class="p-6 md:p-8 space-y-6 max-h-[72vh] overflow-y-auto">
+                <input id="p-id" type="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Kind</label>
+                        <select id="p-kind" class="field mt-2"><option value="poster">Poster</option><option value="product">Product</option></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Category</label>
+                        <select id="p-category" class="field mt-2"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Poster Type</label>
+                        <select id="p-poster-type" class="field mt-2"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Series</label>
+                        <input id="p-series" class="field mt-2" placeholder="Naruto, One Piece, Lifestyle">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Title</label>
+                        <input id="p-title" class="field mt-2" placeholder="Naruto Sage Mode Skyline">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Subtitle</label>
+                        <input id="p-subtitle" class="field mt-2" placeholder="Short punchy line under the title">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Price</label>
+                        <input id="p-price" type="number" class="field mt-2" placeholder="16.99">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Compare Price</label>
+                        <input id="p-compare-price" type="number" class="field mt-2" placeholder="189">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Stock</label>
+                        <input id="p-stock" type="number" class="field mt-2" value="10">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Material</label>
+                        <input id="p-material" class="field mt-2" placeholder="300GSM matte print">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Image URL</label>
+                    <input id="p-image" class="field mt-2" placeholder="/images/narutosage.avif or https://...">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div id="p-collection-wrap">
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Collection</label>
+                        <input id="p-collection" class="field mt-2" placeholder="Love Poster">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Sizes</label>
+                        <input id="p-sizes" class="field mt-2" placeholder="A4, A3, 12x18, 13x19">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">SKU</label>
+                        <input id="p-sku" class="field mt-2" placeholder="LOVE-POSTER-A4">
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Description</label>
+                        <div class="flex items-center gap-3">
+                            <button id="classify-btn" type="button" class="text-sm font-black text-slate-700">Auto classify</button>
+                            <button id="ai-btn" type="button" class="text-sm font-black text-indigo-600">Generate with AI</button>
+                        </div>
+                    </div>
+                    <textarea id="p-desc" class="field mt-2 min-h-28" placeholder="Describe the item with enough detail for the product page."></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Highlight</label>
+                        <input id="p-highlight" class="field mt-2" placeholder="Naruto best poster energy">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Offer Text</label>
+                        <input id="p-offer" class="field mt-2" placeholder="Buy 1 Get 1 Free (add 2 posters)">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Sold (last 16h)</label>
+                        <input id="p-sold" type="number" class="field mt-2" value="7">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Viewing Now</label>
+                        <input id="p-viewing" type="number" class="field mt-2" value="11">
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <label class="field mt-2 flex items-center gap-3 cursor-pointer"><input id="p-featured" type="checkbox" class="w-4 h-4"> <span>Featured item</span></label>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Tags (comma separated)</label>
+                    <input id="p-tags" class="field mt-2" placeholder="Naruto, Poster, Featured, Hero Wall">
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button id="save-btn" class="btn-main flex-1">Save item</button>
+                    <button id="cancel-btn" class="btn-ghost flex-1" type="button">Cancel</button>
+                </div>
+                <div id="modal-error" class="hidden text-sm text-rose-600 font-bold"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ORIGIN = (location.origin && location.origin !== 'null') ? location.origin : 'http://localhost:5000';
+        const API_URL = `${API_ORIGIN}/api`;
+        const isLocalHost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const AI_URL = isLocalHost ? 'http://localhost:8000' : API_ORIGIN;
+        const TOKEN_KEY = 'bureau_admin_token';
+
+        const loginScreen = document.getElementById('login-screen');
+        const adminApp = document.getElementById('admin-app');
+        const modal = document.getElementById('posterModal');
+        const CATALOG_PAGE_SIZE = 12;
+        let postersCache = [];
+        let usersCache = [];
+        const catalogView = {
+            query: '',
+            kind: 'all',
+            page: 1,
+        };
+
+        const POSTER_CATEGORY = ['Poster'];
+        const PRODUCT_CATEGORIES = ['T-Shirt', 'Bag', 'Bottle', 'Manga', 'Keychain', 'Figure', 'Accessory'];
+        const POSTER_TYPES = ['Anime Poster', 'Car Poster', 'Bike Poster', 'Marvel Poster', 'Cartoon Poster', 'Movie Poster', 'Sports Poster'];
+
+        function getToken() { return localStorage.getItem(TOKEN_KEY); }
+        function setToken(token) { localStorage.setItem(TOKEN_KEY, token); }
+        function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+        function authHeaders() { const token = getToken(); return token ? { Authorization: `Bearer ${token}` } : {}; }
+        function forceRelogin(message) {
+            clearToken();
+            closeModal();
+            showLogin();
+            const error = document.getElementById('login-error');
+            if (error) {
+                error.textContent = message || 'Session expired. Login again.';
+                error.classList.remove('hidden');
+            }
+        }
+        function showLogin() { loginScreen.classList.remove('hidden'); adminApp.classList.add('hidden'); }
+        function showApp() { loginScreen.classList.add('hidden'); adminApp.classList.remove('hidden'); }
+        function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+        function closeModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+        function clearModalError() { const el = document.getElementById('modal-error'); el.classList.add('hidden'); el.textContent = ''; }
+        function showModalError(message) { const el = document.getElementById('modal-error'); el.textContent = message; el.classList.remove('hidden'); }
+
+        function fillSelect(selectId, options, selectedValue) {
+            const select = document.getElementById(selectId);
+            const next = Array.isArray(options) ? options : [];
+            select.innerHTML = next.map((value) => `<option value="${value}">${value}</option>`).join('');
+            const selected = String(selectedValue || '').trim();
+            if (selected && next.includes(selected)) {
+                select.value = selected;
+                return;
+            }
+            select.value = next[0] || '';
+        }
+
+        function syncCatalogFormByKind() {
+            const kind = document.getElementById('p-kind').value;
+            const categorySelect = document.getElementById('p-category');
+            const posterTypeSelect = document.getElementById('p-poster-type');
+            const collectionWrap = document.getElementById('p-collection-wrap');
+            const collectionInput = document.getElementById('p-collection');
+
+            if (kind === 'poster') {
+                fillSelect('p-category', POSTER_CATEGORY, 'Poster');
+                fillSelect('p-poster-type', POSTER_TYPES, posterTypeSelect.value || 'Anime Poster');
+                posterTypeSelect.parentElement.classList.remove('hidden');
+                collectionWrap.classList.add('hidden');
+                collectionInput.value = posterTypeSelect.value;
+                categorySelect.disabled = true;
+                return;
+            }
+
+            fillSelect('p-category', PRODUCT_CATEGORIES, categorySelect.value || 'Accessory');
+            posterTypeSelect.parentElement.classList.add('hidden');
+            collectionWrap.classList.remove('hidden');
+            categorySelect.disabled = false;
+        }
+
+        function applyProfileToForm(profile) {
+            if (!profile || typeof profile !== 'object') return;
+
+            if (profile.kind) {
+                document.getElementById('p-kind').value = profile.kind;
+            }
+            syncCatalogFormByKind();
+
+            if (profile.category) {
+                const categorySelect = document.getElementById('p-category');
+                const exists = Array.from(categorySelect.options).some((option) => option.value === profile.category);
+                if (exists) categorySelect.value = profile.category;
+            }
+            if (profile.series) {
+                document.getElementById('p-series').value = profile.series;
+            }
+            if (profile.material) {
+                document.getElementById('p-material').value = profile.material;
+            }
+            if (profile.collection) {
+                if (document.getElementById('p-kind').value === 'poster') {
+                    const posterTypeSelect = document.getElementById('p-poster-type');
+                    const hasType = Array.from(posterTypeSelect.options).some((option) => option.value === profile.collection);
+                    if (hasType) posterTypeSelect.value = profile.collection;
+                }
+                document.getElementById('p-collection').value = profile.collection;
+            }
+            if (Array.isArray(profile.sizes) && profile.sizes.length) {
+                document.getElementById('p-sizes').value = profile.sizes.join(', ');
+            }
+            if (Array.isArray(profile.tags) && profile.tags.length && !document.getElementById('p-tags').value.trim()) {
+                document.getElementById('p-tags').value = profile.tags.join(', ');
+            }
+        }
+
+        async function apiHealth() {
+            try {
+                const res = await fetch(`${API_URL}/health`);
+                if (!res.ok) throw new Error('down');
+                const data = await res.json();
+                document.getElementById('stat-api').textContent = `Online (${data.mode})`;
+            } catch {
+                document.getElementById('stat-api').textContent = 'Offline';
+            }
+        }
+
+        async function aiHealth() {
+            try {
+                const res = await fetch(`${AI_URL}/ai/health`);
+                if (!res.ok) throw new Error('down');
+                document.getElementById('stat-ai').textContent = 'Online';
+            } catch {
+                document.getElementById('stat-ai').textContent = 'Offline';
+            }
+        }
+        function updateStats(items) {
+            const posters = items.filter((item) => item.kind === 'poster');
+            const products = items.filter((item) => item.kind !== 'poster');
+            document.getElementById('stat-count').textContent = items.length;
+            document.getElementById('stat-posters').textContent = posters.length;
+            document.getElementById('stat-products').textContent = products.length;
+        }
+
+        function inr(value) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 2,
+            }).format(Number(value || 0));
+        }
+
+        function applyCatalogFilters(items) {
+            const query = catalogView.query;
+            const kind = catalogView.kind;
+            return items.filter((item) => {
+                const textMatch = !query || [item.title, item.series, item.category, item.kind].join(' ').toLowerCase().includes(query);
+                const kindMatch = kind === 'all' || item.kind === kind || (kind === 'product' && item.kind !== 'poster');
+                return textMatch && kindMatch;
+            });
+        }
+
+        function renderTablePagination(totalItems) {
+            const pagination = document.getElementById('admin-table-pagination');
+            const pages = Math.max(1, Math.ceil(totalItems / CATALOG_PAGE_SIZE));
+            if (catalogView.page > pages) catalogView.page = pages;
+            if (pages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            const parts = ['<button type="button" class="page-dot" data-page="prev">Prev</button>'];
+            for (let i = 1; i <= pages; i += 1) {
+                parts.push(`<button type="button" class="page-dot ${i === catalogView.page ? 'is-active' : ''}" data-page="${i}">${i}</button>`);
+            }
+            parts.push('<button type="button" class="page-dot" data-page="next">Next</button>');
+            pagination.innerHTML = parts.join('');
+        }
+
+        function renderTable(items) {
+            const filtered = applyCatalogFilters(items);
+            updateStats(items);
+            const tbody = document.getElementById('admin-table-body');
+            const tableMeta = document.getElementById('catalog-table-meta');
+            const totalPages = Math.max(1, Math.ceil(filtered.length / CATALOG_PAGE_SIZE));
+            if (catalogView.page > totalPages) catalogView.page = totalPages;
+            const start = (catalogView.page - 1) * CATALOG_PAGE_SIZE;
+            const pageRows = filtered.slice(start, start + CATALOG_PAGE_SIZE);
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400 text-sm">No catalog items found.</td></tr>';
+                tableMeta.textContent = 'Showing 0 items';
+                document.getElementById('admin-table-pagination').innerHTML = '';
+                return;
+            }
+
+            tableMeta.textContent = `Showing ${start + 1}-${start + pageRows.length} of ${filtered.length} items`;
+            renderTablePagination(filtered.length);
+
+            tbody.innerHTML = pageRows.map((item) => `
+                <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.image_url}" alt="${item.title}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200">
+                            <div>
+                                <div class="font-black text-slate-900">${item.title}</div>
+                                <div class="text-xs text-slate-500 font-bold mt-1">${item.highlight || item.subtitle || ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4"><span class="chip ${item.kind === 'poster' ? 'bg-indigo-50 text-indigo-700' : 'bg-amber-50 text-amber-700'}">${item.kind}</span></td>
+                    <td class="p-4 font-bold text-slate-700">${item.category || '-'}</td>
+                    <td class="p-4 font-bold text-slate-700">${item.series || '-'}</td>
+                    <td class="p-4 font-black">${inr(item.price)}</td>
+                    <td class="p-4 font-bold text-slate-600">${typeof item.stock === 'number' ? item.stock : '-'}</td>
+                    <td class="p-4 text-right">
+                        <div class="inline-flex gap-2">
+                            <button type="button" class="btn-ghost !py-2 !px-4" data-edit-id="${item.id}">Edit</button>
+                            <button type="button" class="btn-ghost !py-2 !px-4" data-delete-id="${item.id}">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.querySelectorAll('[data-edit-id]').forEach((button) => {
+                button.addEventListener('click', () => editPoster(button.getAttribute('data-edit-id')));
+            });
+            tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
+                button.addEventListener('click', () => deletePoster(button.getAttribute('data-delete-id')));
+            });
+        }
+
+        function editPoster(id) {
+            const item = postersCache.find((entry) => String(entry.id) === String(id));
+            if (!item) return;
+            document.getElementById('p-id').value = item.id;
+            document.getElementById('p-kind').value = item.kind || 'poster';
+            syncCatalogFormByKind();
+            document.getElementById('p-category').value = item.kind === 'poster' ? 'Poster' : (item.category || 'Accessory');
+            fillSelect('p-poster-type', POSTER_TYPES, item.collection || 'Anime Poster');
+            document.getElementById('p-series').value = item.series || '';
+            document.getElementById('p-title').value = item.title || '';
+            document.getElementById('p-subtitle').value = item.subtitle || '';
+            document.getElementById('p-price').value = Number(item.price || 0);
+            document.getElementById('p-compare-price').value = Number(item.comparePrice || 0);
+            document.getElementById('p-stock').value = typeof item.stock === 'number' ? item.stock : 10;
+            document.getElementById('p-material').value = item.material || '';
+            document.getElementById('p-image').value = item.image_url || '';
+            document.getElementById('p-collection').value = item.collection || item.series || '';
+            document.getElementById('p-sizes').value = Array.isArray(item.sizes) ? item.sizes.join(', ') : '';
+            document.getElementById('p-sku').value = item.sku || '';
+            document.getElementById('p-desc').value = item.description || '';
+            document.getElementById('p-highlight').value = item.highlight || '';
+            document.getElementById('p-offer').value = item.offerText || '';
+            document.getElementById('p-sold').value = Number(item.soldLastHours || 0);
+            document.getElementById('p-viewing').value = Number(item.viewingNow || 0);
+            document.getElementById('p-featured').checked = Boolean(item.featured);
+            document.getElementById('p-tags').value = Array.isArray(item.tags) ? item.tags.join(', ') : '';
+            openModal();
+        }
+
+        async function loadPosters() {
+            const res = await fetch(`${API_URL}/posters`);
+            postersCache = await res.json();
+            catalogView.page = 1;
+            renderTable(postersCache);
+        }
+
+        function showAdminPage(page) {
+            document.querySelectorAll('[data-admin-page]').forEach((panel) => {
+                if (panel.tagName.toLowerCase() === 'button') return;
+                panel.classList.toggle('is-active', panel.getAttribute('data-admin-page') === page);
+            });
+            document.querySelectorAll('.menu-pill[data-admin-page]').forEach((button) => {
+                button.classList.toggle('is-active', button.getAttribute('data-admin-page') === page);
+            });
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch(`${API_URL}/users`, { headers: { ...authHeaders() } });
+                if (res.status === 401) {
+                    forceRelogin('Session expired. Login again.');
+                    return;
+                }
+                usersCache = await res.json();
+                renderUsers(usersCache);
+            } catch {
+                usersCache = [];
+                renderUsers([]);
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const res = await fetch(`${API_URL}/orders`, { headers: { ...authHeaders() } });
+                if (res.status === 401) {
+                    forceRelogin('Session expired. Login again.');
+                    return;
+                }
+                const orders = await res.json();
+                const tbody = document.getElementById('orders-table-body');
+                if (!Array.isArray(orders) || !orders.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 text-sm">No orders yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = orders.slice(0, 60).map((order) => {
+                    const userName = order.userName || (order.shipping && order.shipping.fullName) || 'Unknown';
+                    const created = order.createdAt ? new Date(order.createdAt).toLocaleString() : '-';
+                    return `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="p-4">
+                                <div class="font-black text-slate-900">${order.orderNumber || '-'}</div>
+                                <div class="text-xs text-slate-500 font-semibold mt-1">${created}</div>
+                            </td>
+                            <td class="p-4 text-sm font-semibold text-slate-700">${userName}</td>
+                            <td class="p-4 font-black text-slate-800">${inr(order.total)}</td>
+                            <td class="p-4 text-sm font-bold text-indigo-700">${order.paymentMethod || 'UPI'} / ${order.paymentStatus || 'Pending'}</td>
+                            <td class="p-4"><span class="chip bg-emerald-50 text-emerald-700">${order.status || 'Pending'}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch {
+                const tbody = document.getElementById('orders-table-body');
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 text-sm">Unable to load orders.</td></tr>';
+            }
+        }
+
+        function renderUsers(users) {
+            document.getElementById('users-count').textContent = `${users.length} users`;
+            const tbody = document.getElementById('users-table-body');
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-400 text-sm">No users yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map((user) => {
+                const initials = (user.name || user.email || '?').split(' ').map((part) => part[0]).join('').toUpperCase().slice(0, 2);
+                const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-black">${initials}</div><div class="font-black text-slate-900">${user.name || 'No name'}</div></div></td>
+                        <td class="p-4 text-sm font-semibold text-slate-600">${user.email}</td>
+                        <td class="p-4 text-sm font-semibold text-slate-500">${date}</td>
+                        <td class="p-4"><span class="chip bg-emerald-50 text-emerald-700">Active</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function deletePoster(id) {
+            if (!confirm('Delete this catalog item?')) return;
+            const res = await fetch(`${API_URL}/posters/${id}`, { method: 'DELETE', headers: { ...authHeaders() } });
+            if (res.status === 401) {
+                forceRelogin('Session expired. Login again.');
+                return;
+            }
+            if (!res.ok) return alert('Delete failed.');
+            await loadPosters();
+        }
+
+        async function autoClassifyForm() {
+            clearModalError();
+            const button = document.getElementById('classify-btn');
+            const original = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Classifying...';
+
+            try {
+                const payload = {
+                    kind: document.getElementById('p-kind').value,
+                    category: document.getElementById('p-category').value,
+                    title: document.getElementById('p-title').value.trim(),
+                    subtitle: document.getElementById('p-subtitle').value.trim(),
+                    description: document.getElementById('p-desc').value.trim(),
+                    image_url: document.getElementById('p-image').value.trim(),
+                    collection: document.getElementById('p-collection').value.trim(),
+                    series: document.getElementById('p-series').value.trim(),
+                    tags: (document.getElementById('p-tags').value || '').split(',').map((value) => value.trim()).filter(Boolean),
+                };
+
+                const res = await fetch(`${API_URL}/posters/classify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify(payload),
+                });
+
+                if (res.status === 401) {
+                    forceRelogin('Session expired. Login again.');
+                    return;
+                }
+
+                const profile = await res.json();
+                if (!res.ok) throw new Error(profile.error || 'Unable to classify item');
+                applyProfileToForm(profile);
+            } catch (err) {
+                showModalError(err && err.message ? err.message : 'Unable to classify this item.');
+            } finally {
+                button.disabled = false;
+                button.textContent = original;
+            }
+        }
+
+        async function reclassifyAllCatalogImages() {
+            if (!confirm('Auto classify all catalog images and update categories?')) return;
+
+            const button = document.getElementById('reclassify-btn');
+            const original = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Classifying all...';
+
+            try {
+                const res = await fetch(`${API_URL}/posters/reclassify-images`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({ force: true }),
+                });
+
+                if (res.status === 401) {
+                    forceRelogin('Session expired. Login again.');
+                    return;
+                }
+
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Failed to reclassify catalog');
+                await loadPosters();
+                alert(`Reclassification complete. Updated ${Number(result.updatedCount || 0)} items.`);
+            } catch (err) {
+                alert(err && err.message ? err.message : 'Unable to classify all images.');
+            } finally {
+                button.disabled = false;
+                button.textContent = original;
+            }
+        }
+
+        async function generateWithAI() {
+            const title = document.getElementById('p-title').value.trim();
+            if (!title) return showModalError('Enter a title first.');
+            const button = document.getElementById('ai-btn');
+            button.disabled = true;
+            button.textContent = 'Thinking...';
+            try {
+                const response = await fetch(`${AI_URL}/ai/generate-tags`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        category: document.getElementById('p-category').value,
+                        image_url: document.getElementById('p-image').value.trim(),
+                        tags: document.getElementById('p-tags').value.trim(),
+                    }),
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'AI request failed');
+                if (result.ai_description) document.getElementById('p-desc').value = result.ai_description;
+                if (Array.isArray(result.suggested_tags) && result.suggested_tags.length) {
+                    document.getElementById('p-tags').value = [...new Set(result.suggested_tags)].join(', ');
+                }
+            } catch {
+                showModalError('AI service is unavailable. If deployed separately, set the admin AI URL to that service.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate with AI';
+            }
+        }
+
+        async function savePoster() {
+            clearModalError();
+            const tags = (document.getElementById('p-tags').value || '').split(',').map((value) => value.trim()).filter(Boolean);
+            const posterId = document.getElementById('p-id').value.trim();
+            const kind = document.getElementById('p-kind').value;
+            const collection = kind === 'poster'
+                ? document.getElementById('p-poster-type').value
+                : document.getElementById('p-collection').value.trim();
+            const payload = {
+                kind,
+                category: document.getElementById('p-category').value,
+                series: document.getElementById('p-series').value.trim(),
+                title: document.getElementById('p-title').value.trim(),
+                subtitle: document.getElementById('p-subtitle').value.trim(),
+                price: Number(document.getElementById('p-price').value),
+                comparePrice: Number(document.getElementById('p-compare-price').value || 0),
+                stock: Number(document.getElementById('p-stock').value),
+                material: document.getElementById('p-material').value.trim(),
+                image_url: document.getElementById('p-image').value.trim(),
+                collection,
+                sizes: (document.getElementById('p-sizes').value || '').split(',').map((value) => value.trim()).filter(Boolean),
+                sku: document.getElementById('p-sku').value.trim(),
+                description: document.getElementById('p-desc').value.trim(),
+                highlight: document.getElementById('p-highlight').value.trim(),
+                offerText: document.getElementById('p-offer').value.trim(),
+                soldLastHours: Number(document.getElementById('p-sold').value || 0),
+                viewingNow: Number(document.getElementById('p-viewing').value || 0),
+                featured: document.getElementById('p-featured').checked,
+                tags,
+            };
+            const endpoint = posterId ? `${API_URL}/posters/${encodeURIComponent(posterId)}` : `${API_URL}/posters`;
+            const method = posterId ? 'PUT' : 'POST';
+            const res = await fetch(endpoint, { method, headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+            if (res.status === 401) {
+                forceRelogin('Session expired. Login again.');
+                return;
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                return showModalError(err.error || 'Save failed.');
+            }
+            closeModal();
+            await loadPosters();
+        }
+
+        function clearModalForm() {
+            document.getElementById('p-id').value = '';
+            document.getElementById('p-kind').value = 'poster';
+            fillSelect('p-category', POSTER_CATEGORY, 'Poster');
+            fillSelect('p-poster-type', POSTER_TYPES, 'Anime Poster');
+            document.getElementById('p-series').value = '';
+            document.getElementById('p-title').value = '';
+            document.getElementById('p-subtitle').value = '';
+            document.getElementById('p-price').value = '';
+            document.getElementById('p-compare-price').value = '';
+            document.getElementById('p-stock').value = '10';
+            document.getElementById('p-material').value = '';
+            document.getElementById('p-image').value = '';
+            document.getElementById('p-collection').value = 'Anime Poster';
+            document.getElementById('p-sizes').value = '';
+            document.getElementById('p-sku').value = '';
+            document.getElementById('p-desc').value = '';
+            document.getElementById('p-highlight').value = '';
+            document.getElementById('p-offer').value = '';
+            document.getElementById('p-sold').value = '7';
+            document.getElementById('p-viewing').value = '11';
+            document.getElementById('p-featured').checked = false;
+            document.getElementById('p-tags').value = '';
+            syncCatalogFormByKind();
+            clearModalError();
+        }
+
+        async function login(loginId, password) {
+            const normalized = String(loginId || '').trim();
+            const payload = { email: normalized, username: normalized, password };
+            const res = await fetch(`${API_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!res.ok) throw new Error('Invalid credentials');
+            const data = await res.json();
+            setToken(data.token);
+        }
+
+        async function loadOffers() {
+            try {
+                const res = await fetch(`${API_URL}/content/offers`);
+                const offers = await res.json();
+                document.getElementById('offers-list').innerHTML = offers.map((offer) => `<div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl"><span class="flex-1 font-semibold text-slate-700">${offer.text}</span><button type="button" class="btn-ghost !py-2 !px-3" data-offer-id="${offer.id}">Delete</button></div>`).join('');
+                document.querySelectorAll('[data-offer-id]').forEach((button) => button.addEventListener('click', () => deleteOffer(button.getAttribute('data-offer-id'))));
+            } catch {}
+        }
+
+        async function deleteOffer(id) { await fetch(`${API_URL}/content/offers/${id}`, { method: 'DELETE', headers: { ...authHeaders() } }); loadOffers(); }
+        async function loadPhotos() {
+            try {
+                const res = await fetch(`${API_URL}/content/feedback-photos`);
+                const photos = await res.json();
+                document.getElementById('photos-grid').innerHTML = photos.map((photo) => `<div class="relative group aspect-square rounded-2xl overflow-hidden border border-slate-200"><img src="${photo.url}" alt="${photo.alt}" class="w-full h-full object-cover"><button type="button" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 btn-main !py-2 !px-3" data-photo-id="${photo.id}">Delete</button></div>`).join('');
+                document.querySelectorAll('[data-photo-id]').forEach((button) => button.addEventListener('click', () => deletePhoto(button.getAttribute('data-photo-id'))));
+            } catch {}
+        }
+        async function deletePhoto(id) { await fetch(`${API_URL}/content/feedback-photos/${id}`, { method: 'DELETE', headers: { ...authHeaders() } }); loadPhotos(); }
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const error = document.getElementById('login-error');
+            error.classList.add('hidden');
+            try {
+                await login(document.getElementById('login-email').value.trim(), document.getElementById('login-password').value);
+                showApp();
+                await Promise.all([apiHealth(), aiHealth(), loadPosters(), loadUsers(), loadOffers(), loadPhotos(), loadOrders()]);
+            } catch {
+                error.textContent = 'Login failed. Check admin email and password.';
+                error.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => { clearToken(); showLogin(); });
+        document.getElementById('new-btn').addEventListener('click', () => { clearModalForm(); openModal(); });
+        document.getElementById('refresh-btn').addEventListener('click', loadPosters);
+        document.getElementById('reclassify-btn').addEventListener('click', reclassifyAllCatalogImages);
+        document.getElementById('refresh-users-btn').addEventListener('click', loadUsers);
+        document.getElementById('refresh-orders-btn').addEventListener('click', loadOrders);
+        document.getElementById('admin-search').addEventListener('input', (event) => {
+            catalogView.query = String(event.target.value || '').trim().toLowerCase();
+            catalogView.page = 1;
+            renderTable(postersCache);
+        });
+        document.getElementById('kind-filter').addEventListener('change', (event) => {
+            catalogView.kind = event.target.value;
+            catalogView.page = 1;
+            renderTable(postersCache);
+        });
+        document.getElementById('admin-table-pagination').addEventListener('click', (event) => {
+            const button = event.target.closest('[data-page]');
+            if (!button) return;
+            const maxPage = Math.max(1, Math.ceil(applyCatalogFilters(postersCache).length / CATALOG_PAGE_SIZE));
+            const key = button.getAttribute('data-page');
+            if (key === 'prev') catalogView.page = Math.max(1, catalogView.page - 1);
+            else if (key === 'next') catalogView.page = Math.min(maxPage, catalogView.page + 1);
+            else catalogView.page = Math.max(1, Math.min(maxPage, Number(key) || 1));
+            renderTable(postersCache);
+        });
+        document.querySelectorAll('.menu-pill[data-admin-page]').forEach((button) => {
+            button.addEventListener('click', () => showAdminPage(button.getAttribute('data-admin-page')));
+        });
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('cancel-btn').addEventListener('click', closeModal);
+        document.getElementById('save-btn').addEventListener('click', savePoster);
+        document.getElementById('classify-btn').addEventListener('click', autoClassifyForm);
+        document.getElementById('ai-btn').addEventListener('click', generateWithAI);
+        document.getElementById('add-offer-btn').addEventListener('click', async () => {
+            const text = prompt('Enter offer text:');
+            if (!text) return;
+            await fetch(`${API_URL}/content/offers`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ text }) });
+            loadOffers();
+        });
+        document.getElementById('add-photo-btn').addEventListener('click', async () => {
+            const url = prompt('Enter image URL:');
+            if (!url) return;
+            await fetch(`${API_URL}/content/feedback-photos`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ url, alt: 'Customer wall setup' }) });
+            loadPhotos();
+        });
+        document.getElementById('p-kind').addEventListener('change', syncCatalogFormByKind);
+        document.getElementById('p-poster-type').addEventListener('change', () => {
+            if (document.getElementById('p-kind').value === 'poster') {
+                document.getElementById('p-collection').value = document.getElementById('p-poster-type').value;
+            }
+        });
+
+        (async function init() {
+            fillSelect('p-category', POSTER_CATEGORY, 'Poster');
+            fillSelect('p-poster-type', POSTER_TYPES, 'Anime Poster');
+            syncCatalogFormByKind();
+            showAdminPage('dashboard');
+            if (getToken()) {
+                showApp();
+                await Promise.all([apiHealth(), aiHealth(), loadUsers(), loadOffers(), loadPhotos(), loadOrders()]);
+                try { await loadPosters(); } catch {}
+            } else {
+                showLogin();
+            }
+        })();
+    </script>
+</body>
+</html>

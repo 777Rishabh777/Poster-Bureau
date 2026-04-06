@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Help center</title>
+    <meta name="description" content="Central help center for shipping, contact, FAQs, terms, and brand pages.">
+    <meta name="theme-color" content="#f8fbff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="storefront.css">
+    <style>
+        .help-page { padding: 8.2rem 0 4rem; }
+        .help-grid-main { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1rem; }
+        .support-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1rem; }
+        .reveal { opacity:0; transform:translateY(20px); }
+        @media (max-width: 960px) { .help-grid-main, .support-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 640px) { .help-grid-main, .support-grid { grid-template-columns:1fr; } .help-page { padding-top:7rem; } }
+    </style>
+</head>
+<body data-page="help" class="text-slate-900 antialiased">
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-4 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <main class="help-page">
+        <section>
+            <div class="site-shell smoke-card p-6 md:p-8 reveal">
+                <div class="section-kicker">Help center</div>
+                <h1 class="hero-title mt-6">Support that is easy to scan. <span class="gradient-text">No buried pages.</span></h1>
+                <p class="hero-subtitle mt-6">You asked for a real help center page, so this now becomes the central support jump for contact, shipping, FAQs, brand story, and policy pages.</p>
+                <div class="support-grid mt-8">
+                    <div class="smoke-card p-4">
+                        <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Fast path</div>
+                        <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]">FAQ first</div>
+                    </div>
+                    <div class="smoke-card p-4">
+                        <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Order help</div>
+                        <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]">Shipping + contact</div>
+                    </div>
+                    <div class="smoke-card p-4">
+                        <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Brand info</div>
+                        <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]">About + terms</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell help-grid-main">
+                <a href="faq.html" class="help-card reveal"><div class="pill">FAQ</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Frequently asked questions</h2><p class="text-slate-500 mt-3">Paper quality, delivery time, returns, and setup basics.</p></a>
+                <a href="contact.html" class="help-card reveal"><div class="pill">Contact</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Talk to support</h2><p class="text-slate-500 mt-3">Reach out for issues, bulk orders, or product help.</p></a>
+                <a href="shipping.html" class="help-card reveal"><div class="pill">Shipping</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Delivery and replacements</h2><p class="text-slate-500 mt-3">Shipping policy, handling times, damaged order help.</p></a>
+                <a href="about.html" class="help-card reveal"><div class="pill">About</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Brand story</h2><p class="text-slate-500 mt-3">What the project is, how the print quality works, and why the site feels different.</p></a>
+                <a href="terms.html" class="help-card reveal"><div class="pill">Terms</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Policies and legal basics</h2><p class="text-slate-500 mt-3">Checkout rules, usage terms, and customer responsibilities.</p></a>
+                <a href="account.html" class="help-card reveal"><div class="pill">Account</div><h2 class="font-display text-3xl font-bold mt-5 tracking-[-0.05em]">Your orders and profile</h2><p class="text-slate-500 mt-3">Track saved orders, view your profile, and jump into checkout.</p></a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 md:py-16">
+        <div class="site-shell smoke-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="font-display text-2xl font-bold tracking-[-0.06em]">BUREAU.</div>
+                <p class="text-slate-500 mt-2">Central support landing page for the whole project website.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="collections.html" class="action-btn secondary">Discover</a>
+                <a href="store.html" class="action-btn">Store</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="storefront.js"></script>
+    <script src="auth-nav.js"></script>
+    <script>
+        function initMotion() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.reveal').forEach((node) => { node.style.opacity = '1'; node.style.transform = 'none'; });
+                return;
+            }
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.reveal').forEach((node) => {
+                gsap.to(node, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: node, start: 'top 88%', once: true } });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.BureauUI.hydrateNavigation({ current: 'help' });
+            window.BureauUI.mountMobileMenu();
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        });
+    </script>
+</body>
+</html>
+
+
+

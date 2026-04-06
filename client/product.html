@@ -1,0 +1,440 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Product detail</title>
+    <meta name="description" content="Styled product detail page for posters and setup merch.">
+    <meta name="theme-color" content="#f8fbff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="storefront.css">
+    <style>
+        .product-page { padding: 8.2rem 0 4rem; }
+        .product-grid { display:grid; grid-template-columns:minmax(340px, 0.95fr) minmax(0, 1.05fr); gap:1.2rem; align-items:start; }
+        .product-media { position:sticky; top:6rem; overflow:hidden; border-radius:32px; min-height:34rem; }
+        .product-media-backdrop {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        .product-media-backdrop img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(12px) saturate(1.08);
+            transform: scale(1.08);
+            opacity: 0.45;
+        }
+        .product-frame-wrap {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            min-height: 34rem;
+            display: grid;
+            place-items: center;
+            padding: 1.2rem 1rem 4.5rem;
+        }
+        .product-frame {
+            width: min(88%, 420px);
+            aspect-ratio: 2 / 3;
+            border: 3px solid rgba(248, 250, 252, 0.95);
+            background: #fff;
+            box-shadow: 0 22px 46px rgba(15, 23, 42, 0.28);
+            padding: 0.48rem;
+            transition: transform 0.25s ease;
+        }
+        .product-frame.is-plain {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+        }
+        .product-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-frame.is-animated {
+            animation: posterFloat 4s ease-in-out infinite;
+        }
+        .product-frame.is-animated img {
+            animation: posterPulse 6s ease-in-out infinite;
+        }
+        @keyframes posterFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes posterPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .detail-stack { display:grid; gap:1rem; }
+        .spec-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1rem; }
+        .product-main-title { font-family:'Space Grotesk', sans-serif; font-size:clamp(2.2rem, 6.4vw, 5.2rem); line-height:0.94; letter-spacing:-0.055em; }
+        .product-main-subtitle { max-width:42rem; font-size:clamp(0.98rem, 1.8vw, 1.8rem); color:#5b6472; }
+        .mini-metric { border:1px solid rgba(148,163,184,0.2); border-radius:16px; padding:0.72rem 0.9rem; background:rgba(255,255,255,0.7); }
+        .size-chip { border:1px solid rgba(148,163,184,0.24); border-radius:999px; padding:0.4rem 0.8rem; font-weight:800; color:#334155; background:#fff; }
+        .size-chip.is-active { background:#0f172a; color:#fff; border-color:#0f172a; }
+        .related-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1rem; }
+        .reveal { opacity:0; transform:translateY(20px); }
+        @media (max-width: 1100px) { .product-grid, .related-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } .product-media { position:relative; top:auto; } }
+        @media (max-width: 760px) { .product-grid, .related-grid, .spec-grid { grid-template-columns:1fr; } .product-page { padding-top:7rem; } }
+    </style>
+</head>
+<body data-page="product" class="text-slate-900 antialiased">
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-4 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <button class="icon-btn relative" type="button" data-cart-toggle aria-label="Open cart">
+                    <i class="fas fa-bag-shopping"></i>
+                    <span id="cart-count" class="absolute -right-1 -top-1 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <div id="cart-backdrop" class="cart-backdrop"></div>
+    <aside id="cart-panel" class="cart-panel">
+        <div class="h-full bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <div class="section-kicker">Cart</div>
+                    <h2 class="font-display text-2xl font-bold mt-3 tracking-[-0.05em]">Your setup bag</h2>
+                </div>
+                <button type="button" class="icon-btn" data-cart-close aria-label="Close cart"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+            <div class="smoke-card p-4">
+                <div class="flex items-center justify-between text-sm font-bold text-slate-500 uppercase tracking-[0.16em]">
+                    <span>Subtotal</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <a href="checkout.html" class="action-btn w-full mt-4">Checkout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="product-page">
+        <section>
+            <div class="site-shell product-grid">
+                <div class="smoke-card product-media reveal tilt-card">
+                    <div class="product-media-backdrop"><img id="product-image-bg" src="images/narutosage.avif" alt=""></div>
+                    <div class="product-frame-wrap">
+                        <div class="product-frame" id="product-frame">
+                            <img id="product-image" src="images/narutosage.avif" alt="Product image">
+                        </div>
+                    </div>
+                    <div class="absolute inset-x-0 bottom-0 p-5 text-white z-10">
+                        <div class="section-kicker !bg-white/15 !text-white !border-white/15" id="product-badge">Poster</div>
+                        <div class="font-display text-3xl font-bold mt-4 tracking-[-0.05em]" id="product-highlight">Naruto best poster energy</div>
+                    </div>
+                </div>
+                <div class="detail-stack">
+                    <div class="smoke-card p-6 md:p-8 reveal">
+                        <a href="discover.html" id="back-link" class="text-sm font-black uppercase tracking-[0.18em] text-slate-400">Back to browse</a>
+                        <div class="pill mt-4" id="product-series">Naruto</div>
+                        <h1 class="product-main-title mt-6" id="product-title">Naruto Sage Mode Skyline</h1>
+                        <p class="product-main-subtitle mt-6" id="product-subtitle">Orange chakra, night haze, clean hero framing.</p>
+                        <div class="mt-8">
+                            <div class="flex items-end gap-3">
+                                <div class="font-display text-4xl font-bold tracking-[-0.05em]" id="product-price">$0.00</div>
+                                <div id="product-compare" class="text-lg font-bold text-slate-400 line-through"></div>
+                                <div id="product-discount" class="text-sm font-black text-rose-600"></div>
+                            </div>
+                            <div id="product-offer" class="text-sm font-bold text-emerald-600 mt-2"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+                            <div class="mini-metric"><div class="text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Sold in 16h</div><div id="metric-sold" class="font-display text-2xl font-bold mt-1">0</div></div>
+                            <div class="mini-metric"><div class="text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Viewing now</div><div id="metric-viewing" class="font-display text-2xl font-bold mt-1">0</div></div>
+                            <div class="mini-metric"><div class="text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">SKU</div><div id="metric-sku" class="font-display text-base font-bold mt-2">-</div></div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Size</div>
+                            <div class="flex flex-wrap gap-2 mt-3" id="size-host"></div>
+                        </div>
+
+                        <div class="mt-5 flex items-center gap-3">
+                            <label for="qty-input" class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Quantity</label>
+                            <input id="qty-input" type="number" min="1" value="1" class="field !w-24 !rounded-xl !py-2 !px-3">
+                            <div class="text-sm font-bold text-slate-500">Subtotal: <span id="line-subtotal" class="text-slate-900">$0.00</span></div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <button id="add-to-cart" type="button" class="action-btn">Add to cart</button>
+                            <button id="buy-now" type="button" class="action-btn">Buy now</button>
+                            <button id="share-product" type="button" class="action-btn secondary">Share</button>
+                            <a id="secondary-link" href="discover.html" class="action-btn secondary">Back to discover</a>
+                        </div>
+                    </div>
+                    <div class="smoke-card p-6 md:p-8 reveal">
+                        <div class="section-kicker">Why it works</div>
+                        <p class="text-slate-500 text-lg leading-8 mt-5" id="product-description">Loading product story...</p>
+                        <div class="spec-grid mt-8">
+                            <div class="smoke-card p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Type</div>
+                                <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]" id="spec-type">Poster</div>
+                            </div>
+                            <div class="smoke-card p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Material</div>
+                                <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]" id="spec-material">300GSM matte print</div>
+                            </div>
+                            <div class="smoke-card p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Series</div>
+                                <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]" id="spec-series">Naruto</div>
+                            </div>
+                            <div class="smoke-card p-4">
+                                <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Availability</div>
+                                <div class="font-display text-2xl font-bold mt-2 tracking-[-0.05em]" id="spec-stock">In stock</div>
+                            </div>
+                        </div>
+
+                        <div class="smoke-card p-4 mt-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Special offer</div>
+                            <ul id="offer-list" class="mt-3 text-sm font-semibold text-slate-600 space-y-2"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell space-y-5">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 reveal">
+                    <div>
+                        <div class="section-kicker">More from this story</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Related picks that keep the same energy.</h2>
+                    </div>
+                    <a href="help-center.html" class="action-btn secondary">Need sizing or shipping help?</a>
+                </div>
+                <div class="related-grid" id="related-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 md:py-16">
+        <div class="site-shell smoke-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="font-display text-2xl font-bold tracking-[-0.06em]">BUREAU.</div>
+                <p class="text-slate-500 mt-2">Styled product page for every poster and merch click.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="collections.html" class="action-btn secondary">Discover</a>
+                <a href="store.html" class="action-btn">Store</a>
+            </div>
+        </div>
+    </footer>
+    <script src="catalog.js"></script>
+    <script src="storefront.js"></script>
+    <script src="auth-nav.js"></script>
+    <script>
+        function relatedCard(item) {
+            const mediaMarkup = item.kind === 'poster'
+                ? `<div class="showcase-mock"><div class="showcase-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div></div>`
+                : `<div class="showcase-mock no-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div>`;
+
+            return `
+                <article class="smoke-card catalog-card showcase-card reveal tilt-card">
+                    <a href="${window.BureauCatalog.buildProductUrl(item)}" class="catalog-thumb">
+                        <span class="showcase-sale">Sale</span>
+                        ${mediaMarkup}
+                        <button type="button" class="showcase-quick" data-add-cart="${item.slug}">Quick Add</button>
+                        <div class="catalog-badge pill" style="background:rgba(255,255,255,0.88);">${item.series || item.type}</div>
+                    </a>
+                    <div class="catalog-meta">
+                        <div>
+                            <div class="catalog-icon-pill"><i class="fa-solid ${window.BureauUI.itemIconClass(item)}"></i><span>${item.type}</span></div>
+                            <h3 class="catalog-title">${item.title}</h3>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 mt-5">
+                            <div class="font-display text-2xl font-bold tracking-[-0.05em]">${window.BureauCatalog.money(item.price)}</div>
+                            <a href="${window.BureauCatalog.buildProductUrl(item)}" class="action-btn !py-3 !px-4">Open</a>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function discountPercent(item) {
+            const oldValue = Number(item.comparePrice || 0);
+            const current = Number(item.price || 0);
+            if (!oldValue || oldValue <= current) return 0;
+            return Math.round(((oldValue - current) / oldValue) * 100);
+        }
+
+        function initMotion() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.reveal').forEach((node) => { node.style.opacity = '1'; node.style.transform = 'none'; });
+                return;
+            }
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.reveal').forEach((node) => {
+                gsap.to(node, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: node, start: 'top 88%', once: true } });
+            });
+        }
+
+        async function boot() {
+            window.BureauUI.hydrateNavigation();
+            window.BureauUI.mountMobileMenu();
+            const cart = window.BureauUI.mountCart();
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug') || 'naruto-sage-mode-skyline';
+            const id = params.get('id');
+            const item = id ? await window.BureauCatalog.fetchById(id) : await window.BureauCatalog.fetchBySlug(slug);
+            const catalog = await window.BureauCatalog.fetchCatalog();
+            const product = item || catalog[0];
+            if (!product) return;
+
+            document.title = `BUREAU | ${product.title}`;
+            document.getElementById('product-image').src = product.image_url;
+            document.getElementById('product-image').alt = product.title;
+            document.getElementById('product-image-bg').src = product.image_url;
+            document.getElementById('product-badge').textContent = product.type;
+            document.getElementById('product-highlight').textContent = product.highlight;
+            document.getElementById('product-series').textContent = product.series;
+            document.getElementById('product-title').textContent = product.title;
+            document.getElementById('product-subtitle').textContent = product.subtitle;
+            document.getElementById('product-price').textContent = window.BureauCatalog.money(product.price);
+            const discount = discountPercent(product);
+            document.getElementById('product-compare').textContent = product.comparePrice > product.price ? window.BureauCatalog.money(product.comparePrice) : '';
+            document.getElementById('product-discount').textContent = discount ? `(-${discount}%)` : '';
+            document.getElementById('product-offer').textContent = product.offerText || 'Free shipping on prepaid orders';
+            document.getElementById('product-description').textContent = product.description;
+            document.getElementById('spec-type').textContent = product.type;
+            document.getElementById('spec-material').textContent = product.material;
+            document.getElementById('spec-series').textContent = product.series;
+            document.getElementById('spec-stock').textContent = product.stock > 0 ? `${product.stock} ready` : 'Limited';
+            document.getElementById('metric-sold').textContent = product.soldLastHours || 7;
+            document.getElementById('metric-viewing').textContent = product.viewingNow || 11;
+            document.getElementById('metric-sku').textContent = product.sku || '-';
+
+            const sizeHost = document.getElementById('size-host');
+            const sizes = Array.isArray(product.sizes) && product.sizes.length
+                ? product.sizes
+                : (product.kind === 'poster' ? ['A4', 'A3', '12x18', '13x19'] : ['One Size']);
+            sizeHost.innerHTML = sizes.map((size, index) => `<button type="button" class="size-chip ${index === 0 ? 'is-active' : ''}" data-size>${size}</button>`).join('');
+            sizeHost.querySelectorAll('[data-size]').forEach((node) => {
+                node.addEventListener('click', () => {
+                    sizeHost.querySelectorAll('[data-size]').forEach((x) => x.classList.remove('is-active'));
+                    node.classList.add('is-active');
+                });
+            });
+
+            const selectedSize = () => {
+                const active = sizeHost.querySelector('[data-size].is-active');
+                return active ? String(active.textContent || '').trim() : (sizes[0] || 'A4');
+            };
+
+            const qtyInput = document.getElementById('qty-input');
+            const subtotal = document.getElementById('line-subtotal');
+            const refreshSubtotal = () => {
+                const qty = Math.max(1, Number(qtyInput.value || 1));
+                qtyInput.value = qty;
+                subtotal.textContent = window.BureauCatalog.money(product.price * qty);
+            };
+            qtyInput.addEventListener('input', refreshSubtotal);
+            refreshSubtotal();
+
+            const offers = [
+                product.offerText || 'Buy 1 Get 1 Free (add 2 posters)',
+                'Buy 2 Get 2 Free (add 4 posters)',
+                'Free shipping on prepaid orders',
+                'COD available on eligible pincodes',
+            ];
+            document.getElementById('offer-list').innerHTML = offers.map((line) => `<li><i class="fa-solid fa-check text-emerald-600 mr-2"></i>${line}</li>`).join('');
+
+            const isPoster = product.kind === 'poster';
+            document.getElementById('product-frame').classList.toggle('is-animated', isPoster);
+            document.getElementById('product-frame').classList.toggle('is-plain', !isPoster);
+            document.getElementById('back-link').href = isPoster ? `discover.html?series=${encodeURIComponent(product.series)}` : `store.html`;
+            document.getElementById('back-link').textContent = isPoster ? 'Back to discover' : 'Back to store';
+            document.getElementById('secondary-link').href = isPoster ? 'discover.html' : 'store.html';
+            document.getElementById('secondary-link').textContent = isPoster ? 'Back to discover' : 'Back to store';
+            document.getElementById('add-to-cart').addEventListener('click', () => {
+                const qty = Math.max(1, Number(document.getElementById('qty-input').value || 1));
+                const size = selectedSize();
+                for (let i = 0; i < qty; i += 1) cart.add(product, { open: i === qty - 1, size });
+            });
+
+            document.getElementById('buy-now').addEventListener('click', () => {
+                const qty = Math.max(1, Number(document.getElementById('qty-input').value || 1));
+                const lines = [];
+                for (let i = 0; i < qty; i += 1) {
+                    lines.push({
+                        id: product.id,
+                        slug: product.slug,
+                        title: product.title,
+                        price: Number(product.price || 0),
+                        image_url: product.image_url,
+                        size: selectedSize(),
+                    });
+                }
+                localStorage.setItem(window.BureauCatalog.CART_KEY, JSON.stringify(lines));
+                window.location.href = 'checkout.html';
+            });
+
+            document.getElementById('share-product').addEventListener('click', async () => {
+                const shareData = {
+                    title: `The Poster Bureau | ${product.title}`,
+                    text: product.subtitle || product.title,
+                    url: window.location.href,
+                };
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                        return;
+                    }
+                } catch {
+                    // fallback to clipboard
+                }
+
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    window.BureauUI.toast('Product link copied');
+                } catch {
+                    window.BureauUI.toast('Unable to copy link');
+                }
+            });
+
+            const related = catalog.filter((entry) => entry.slug !== product.slug && (entry.series === product.series || entry.kind === product.kind)).slice(0, 4);
+            document.getElementById('related-grid').innerHTML = related.map(relatedCard).join('');
+            const bySlug = new Map(catalog.map((entry) => [entry.slug, entry]));
+            document.querySelectorAll('#related-grid [data-add-cart]').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const itemRef = bySlug.get(button.getAttribute('data-add-cart'));
+                    if (!itemRef) return;
+                    cart.add(itemRef, { open: false });
+                });
+            });
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        }
+
+        window.addEventListener('DOMContentLoaded', boot);
+    </script>
+</body>
+</html>
+
+
+

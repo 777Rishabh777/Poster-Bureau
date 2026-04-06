@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-slate-50">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Create Account</title>
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-extrabold tracking-tight">
+                BUREAU<span class="text-indigo-600">.</span>
+            </a>
+            <div class="flex items-center gap-3 text-sm font-bold">
+                <a href="store.html"
+                    class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition text-slate-700">Store</a>
+                <a href="collections.html"
+                    class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition text-slate-700">Collections</a>
+                <a href="login.html"
+                    class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white transition">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-14">
+        <div class="max-w-lg mx-auto bg-white border border-slate-200 rounded-3xl shadow-xl p-8">
+            <h1 class="text-3xl font-extrabold mb-2">Create your account</h1>
+            <p class="text-slate-500 font-medium mb-8">Save your cart and checkout faster.</p>
+
+            <form id="register-form" class="space-y-4">
+                <div>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Name</label>
+                    <input id="name"
+                        class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                        placeholder="Your name" />
+                </div>
+                <div>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Email</label>
+                    <input id="email" type="email"
+                        class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                        placeholder="you@email.com" required />
+                </div>
+                <div>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Password</label>
+                    <input id="password" type="password"
+                        class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                        placeholder="6+ characters" required />
+                </div>
+
+                <button
+                    class="w-full bg-indigo-600 hover:bg-slate-900 text-white py-3.5 rounded-xl font-extrabold transition shadow-md"
+                    type="submit">
+                    Create account
+                </button>
+                <div id="error" class="hidden text-sm text-red-600 font-semibold"></div>
+            </form>
+
+            <div class="mt-8 text-sm text-slate-600 font-medium">
+                Already have an account?
+                <a href="login.html" class="font-extrabold text-indigo-600 hover:text-slate-900 transition">Login</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const TOKEN_KEY = 'bureau_user_token';
+        const API_ORIGIN = (location.origin && location.origin !== 'null') ? location.origin : 'http://localhost:5000';
+        const API_URL = `${API_ORIGIN}/api`;
+
+        function setToken(token) {
+            localStorage.setItem(TOKEN_KEY, token);
+        }
+
+        function getReturnTo() {
+            const p = new URLSearchParams(location.search);
+            return p.get('returnTo') || 'account.html';
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('error');
+            errorEl.classList.add('hidden');
+
+            const payload = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/users/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Register failed');
+
+                setToken(data.token);
+                window.location.href = getReturnTo();
+            } catch (err) {
+                errorEl.innerText = err && err.message ? err.message : 'Register failed';
+                errorEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Discover Storyline</title>
+    <meta name="description" content="A detailed discovery page with storyline sections, animated data views, and backend-driven poster and merch exploration.">
+    <meta name="theme-color" content="#f8fbff">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="storefront.css">
+    <style>
+        .discover-page { padding: 1.25rem 0 4rem; }
+        .story-hero { position: relative; overflow: hidden; }
+        .story-hero::before {
+            content: '';
+            position: absolute;
+            inset: -5rem auto auto -6rem;
+            width: 26rem;
+            height: 26rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.2), transparent 72%);
+            filter: blur(18px);
+            pointer-events: none;
+        }
+        .story-hero::after {
+            content: '';
+            position: absolute;
+            inset: auto -8rem -6rem auto;
+            width: 30rem;
+            height: 30rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.2), transparent 70%);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+        .hero-layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
+            gap: 1.1rem;
+            align-items: stretch;
+        }
+        .hero-story-cloud {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .hero-story-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 26px;
+            min-height: 12rem;
+        }
+        .hero-story-card:nth-child(1) { grid-row: span 2; min-height: 28rem; }
+        .hero-story-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        .storyline-grid,
+        .chapter-grid,
+        .discover-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .discover-product-card .catalog-meta {
+            padding: 0.85rem 0.85rem 1rem;
+        }
+
+        .discover-product-card .catalog-title {
+            font-size: 0.95rem;
+            margin-top: 0.7rem;
+        }
+
+        .discover-product-card .catalog-copy {
+            font-size: 0.8rem;
+            line-height: 1.45;
+            margin-top: 0.45rem;
+        }
+
+        .chapter-card {
+            padding: 1.15rem;
+            border-radius: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(255, 255, 255, 0.72);
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+        }
+
+        .series-bar {
+            height: 9px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.22);
+            overflow: hidden;
+        }
+        .series-bar > span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #4f46e5, #0ea5e9, #f97316);
+            border-radius: inherit;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1.2fr auto auto;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .reveal { opacity: 0; transform: translateY(20px); }
+
+        @media (max-width: 1180px) {
+            .storyline-grid,
+            .chapter-grid,
+            .discover-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .hero-layout,
+            .toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 760px) {
+            .discover-page { padding-top: 1rem; }
+            .storyline-grid,
+            .chapter-grid,
+            .discover-grid,
+            .hero-layout,
+            .hero-story-cloud,
+            .toolbar { grid-template-columns: 1fr; }
+            .hero-story-card:nth-child(1) { min-height: 17rem; }
+        }
+    </style>
+</head>
+<body data-page="discover" class="text-slate-900 antialiased">
+    <div class="site-shell pt-4">
+        <nav class="glass-nav rounded-[28px] px-4 md:px-6 py-3 flex items-center justify-between gap-4 sticky top-4 z-50">
+            <a href="index.html" class="font-display text-xl md:text-2xl font-bold tracking-[-0.08em] text-slate-950">BUREAU.</a>
+            <div class="hidden lg:flex items-center gap-2 text-sm font-bold" data-shared-nav></div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div id="auth-area" class="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <a href="account.html" id="auth-link" class="nav-link">Login / Register</a>
+                </div>
+                <button id="mobile-menu-open" class="icon-btn lg:hidden" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <button class="icon-btn relative" type="button" data-cart-toggle aria-label="Open cart">
+                    <i class="fas fa-bag-shopping"></i>
+                    <span id="cart-count" class="absolute -right-1 -top-1 w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-slate-950/40 z-[65]"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[88vw] max-w-sm translate-x-full transition-transform duration-300 z-[75] bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="font-display text-xl font-bold tracking-[-0.08em]">BUREAU.</div>
+            <button id="mobile-menu-close" class="icon-btn" type="button" aria-label="Close menu"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div data-shared-mobile-nav class="flex flex-col gap-1"></div>
+    </aside>
+
+    <div id="cart-backdrop" class="cart-backdrop"></div>
+    <aside id="cart-panel" class="cart-panel">
+        <div class="h-full bg-white border-l border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <div class="section-kicker">Cart</div>
+                    <h2 class="font-display text-2xl font-bold mt-3 tracking-[-0.05em]">Your setup bag</h2>
+                </div>
+                <button type="button" class="icon-btn" data-cart-close aria-label="Close cart"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
+            <div class="smoke-card p-4">
+                <div class="flex items-center justify-between text-sm font-bold text-slate-500 uppercase tracking-[0.16em]">
+                    <span>Subtotal</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <a href="checkout.html" class="action-btn w-full mt-4">Checkout</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="discover-page">
+        <section class="story-hero">
+            <div class="site-shell hero-layout">
+                <div class="smoke-card p-6 md:p-8 reveal">
+                    <div class="section-kicker">Discover storyline</div>
+                    <h1 class="hero-title mt-6">From vibe to wall, <span class="gradient-text">discover every chapter.</span></h1>
+                    <p class="hero-subtitle mt-6">This page is your exploration layer. It tells the story of the catalog, shows what is trending, and helps you move from inspiration to product detail in one clean flow.</p>
+
+                    <div class="storyline-grid mt-8">
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Total catalog</div>
+                            <div class="font-display text-3xl font-bold tracking-[-0.05em] mt-2" id="stat-total">0</div>
+                        </div>
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Poster arcs</div>
+                            <div class="font-display text-3xl font-bold tracking-[-0.05em] mt-2" id="stat-posters">0</div>
+                        </div>
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Merch drops</div>
+                            <div class="font-display text-3xl font-bold tracking-[-0.05em] mt-2" id="stat-products">0</div>
+                        </div>
+                        <div class="smoke-card p-4">
+                            <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Series worlds</div>
+                            <div class="font-display text-3xl font-bold tracking-[-0.05em] mt-2" id="stat-series">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-story-cloud reveal" id="hero-story-cloud">
+                    <a class="smoke-card hero-story-card tilt-card" href="discover.html?series=Naruto"><img src="images/naruto3.jpg" alt="Naruto wall"></a>
+                    <a class="smoke-card hero-story-card tilt-card" href="discover.html?series=One%20Piece"><img src="images/One%20Piece2.jpg" alt="One Piece wall"></a>
+                    <a class="smoke-card hero-story-card tilt-card" href="discover.html?series=Jujutsu%20Kaisen"><img src="images/gojo%20.jpg" alt="JJK wall"></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell space-y-5">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 reveal">
+                    <div>
+                        <div class="section-kicker">Story chapters</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">How users discover in this site flow.</h2>
+                    </div>
+                    <a href="collections.html" class="action-btn secondary">Open collection index</a>
+                </div>
+
+                <div class="chapter-grid">
+                    <article class="chapter-card reveal">
+                        <div class="pill">01</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Find your universe</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Start with series and story mood, then focus into poster-only or merch-only pathways.</p>
+                    </article>
+                    <article class="chapter-card reveal">
+                        <div class="pill">02</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Compare vibe and detail</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Each card gives quick context so users can judge visual tone before opening details.</p>
+                    </article>
+                    <article class="chapter-card reveal">
+                        <div class="pill">03</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Open product chapter</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Every route lands on a complete product page with sizes, offers, and cart actions.</p>
+                    </article>
+                    <article class="chapter-card reveal">
+                        <div class="pill">04</div>
+                        <h3 class="font-display text-2xl font-bold mt-4 tracking-[-0.04em]">Build your setup story</h3>
+                        <p class="text-slate-500 mt-3 leading-7">Mix posters and accessories from backend-driven inventory to shape one room identity.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell space-y-5">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 reveal">
+                    <div>
+                        <div class="section-kicker">Series radar</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Trending worlds this week.</h2>
+                    </div>
+                    <p class="max-w-xl text-slate-500 text-lg">Live bars below are calculated from your backend inventory counts.</p>
+                </div>
+                <div id="series-radar" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </section>
+
+        <section class="py-10 md:py-14">
+            <div class="site-shell space-y-5">
+                <div class="toolbar reveal">
+                    <label class="smoke-card p-4 flex items-center gap-3">
+                        <i class="fas fa-magnifying-glass text-slate-400"></i>
+                        <input id="search-input" class="w-full bg-transparent outline-none" placeholder="Search title, series, tags...">
+                    </label>
+                    <select id="kind-filter" class="field !rounded-2xl">
+                        <option value="All">All types</option>
+                        <option value="poster">Poster only</option>
+                        <option value="product">Merch only</option>
+                    </select>
+                    <select id="series-filter" class="field !rounded-2xl">
+                        <option value="All">All series</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 reveal">
+                    <div>
+                        <div class="section-kicker">Discovery feed</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-bold tracking-[-0.06em] mt-4">Detailed picks from the live catalog.</h2>
+                    </div>
+                    <div class="text-sm font-bold text-slate-500" id="feed-meta">Showing 0 items</div>
+                </div>
+
+                <div class="discover-grid" id="discover-grid"></div>
+                <div id="discover-empty" class="empty-card hidden reveal">No items match current filters. Try different search words or choose All series.</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 md:py-16">
+        <div class="site-shell smoke-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="font-display text-2xl font-bold tracking-[-0.06em]">BUREAU.</div>
+                <p class="text-slate-500 mt-2">Discover layer: storyline, trends, and backend-driven exploration in one page.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="index.html" class="action-btn secondary">Home</a>
+                <a href="store.html" class="action-btn">Store</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="catalog.js"></script>
+    <script src="storefront.js"></script>
+    <script src="auth-nav.js"></script>
+    <script>
+        let catalogItems = [];
+        let discoverCartApi = null;
+
+        function cardTemplate(item) {
+            const mediaMarkup = item.kind === 'poster'
+                ? `<div class="showcase-mock"><div class="showcase-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div></div>`
+                : `<div class="showcase-mock no-frame"><img src="${item.image_url}" alt="${item.title}" loading="lazy"></div>`;
+
+            return `
+                <article class="smoke-card catalog-card discover-product-card reveal tilt-card">
+                    <a href="${window.BureauCatalog.buildProductUrl(item)}" class="catalog-thumb">
+                        <span class="showcase-sale">Sale</span>
+                        ${mediaMarkup}
+                        <button type="button" class="showcase-quick" data-add-cart="${item.slug}">Quick Add</button>
+                        <div class="catalog-badge pill" style="background:rgba(255,255,255,0.88);">${item.series || item.type}</div>
+                    </a>
+                    <div class="catalog-meta">
+                        <div>
+                            <div class="catalog-meta-top">
+                                <div class="catalog-icon-pill"><i class="fa-solid ${window.BureauUI.itemIconClass(item)}"></i><span>${item.type}</span></div>
+                                <div class="text-xs font-black uppercase tracking-[0.18em] text-slate-400">${item.kind}</div>
+                            </div>
+                            <h3 class="catalog-title mt-4">${item.title}</h3>
+                            <p class="catalog-copy mt-3">${item.subtitle}</p>
+                            <p class="text-[0.72rem] font-semibold text-slate-500 mt-2">Stock: ${Number(item.stock || 0)}</p>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 mt-5">
+                            <div class="font-display text-xl font-bold tracking-[-0.05em]">${window.BureauCatalog.money(item.price)}</div>
+                            <a href="${window.BureauCatalog.buildProductUrl(item)}" class="action-btn !py-2 !px-3">Open</a>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderSeriesFilter(items) {
+            const host = document.getElementById('series-filter');
+            const selected = host.value || 'All';
+            const values = ['All', ...window.BureauCatalog.getSeriesList(items)];
+            host.innerHTML = values.map((series) => `<option value="${series}">${series}</option>`).join('');
+            host.value = values.includes(selected) ? selected : 'All';
+        }
+
+        function renderRadar(items) {
+            const counts = {};
+            items.forEach((item) => {
+                counts[item.series] = (counts[item.series] || 0) + 1;
+            });
+
+            const entries = Object.entries(counts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+
+            const max = entries.length ? entries[0][1] : 1;
+            const host = document.getElementById('series-radar');
+            host.innerHTML = entries.map(([series, count]) => `
+                <div class="smoke-card p-4 reveal">
+                    <div class="flex items-center justify-between gap-3 mb-3">
+                        <div class="font-display text-2xl font-bold tracking-[-0.04em]">${series}</div>
+                        <div class="text-sm font-black text-slate-500">${count} items</div>
+                    </div>
+                    <div class="series-bar"><span data-radar-width="${Math.round((count / max) * 100)}"></span></div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const kind = document.getElementById('kind-filter').value;
+            const series = document.getElementById('series-filter').value;
+
+            const filtered = catalogItems.filter((item) => {
+                if (kind !== 'All' && item.kind !== kind) return false;
+                if (series !== 'All' && item.series !== series) return false;
+                if (query && !item.searchText.includes(query)) return false;
+                return true;
+            });
+
+            const grid = document.getElementById('discover-grid');
+            const empty = document.getElementById('discover-empty');
+            document.getElementById('feed-meta').textContent = `Showing ${filtered.length} items`;
+
+            if (!filtered.length) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = filtered.slice(0, 12).map(cardTemplate).join('');
+            const bySlug = new Map(catalogItems.map((item) => [item.slug, item]));
+            grid.querySelectorAll('[data-add-cart]').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const item = bySlug.get(button.getAttribute('data-add-cart'));
+                    if (!item || !discoverCartApi) return;
+                    discoverCartApi.add(item, { open: false });
+                });
+            });
+            window.BureauUI.mountTiltCards();
+            initMotion();
+        }
+
+        function initMotion() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelectorAll('.reveal').forEach((node) => {
+                    node.style.opacity = '1';
+                    node.style.transform = 'none';
+                });
+                document.querySelectorAll('[data-radar-width]').forEach((node) => {
+                    node.style.width = `${node.getAttribute('data-radar-width')}%`;
+                });
+                return;
+            }
+
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.reveal').forEach((node) => {
+                gsap.to(node, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.72,
+                    ease: 'power3.out',
+                    scrollTrigger: { trigger: node, start: 'top 88%', once: true },
+                });
+            });
+
+            gsap.to('#hero-story-cloud', {
+                y: -24,
+                scrollTrigger: { trigger: '.story-hero', start: 'top top', end: 'bottom top', scrub: 0.45 },
+            });
+
+            document.querySelectorAll('[data-radar-width]').forEach((node) => {
+                gsap.to(node, {
+                    width: `${node.getAttribute('data-radar-width')}%`,
+                    duration: 0.85,
+                    ease: 'power2.out',
+                    scrollTrigger: { trigger: node.closest('.smoke-card'), start: 'top 88%', once: true },
+                });
+            });
+        }
+
+        async function boot() {
+            window.BureauUI.hydrateNavigation({ current: 'discover' });
+            window.BureauUI.mountMobileMenu();
+            discoverCartApi = window.BureauUI.mountCart();
+
+            catalogItems = await window.BureauCatalog.fetchCatalog();
+            const posters = window.BureauCatalog.getPosters(catalogItems);
+            const products = window.BureauCatalog.getProducts(catalogItems);
+            const series = window.BureauCatalog.getSeriesList(catalogItems);
+
+            document.getElementById('stat-total').textContent = catalogItems.length;
+            document.getElementById('stat-posters').textContent = posters.length;
+            document.getElementById('stat-products').textContent = products.length;
+            document.getElementById('stat-series').textContent = series.length;
+
+            renderSeriesFilter(catalogItems);
+            renderRadar(catalogItems);
+            applyFilters();
+
+            document.getElementById('search-input').addEventListener('input', applyFilters);
+            document.getElementById('kind-filter').addEventListener('change', applyFilters);
+            document.getElementById('series-filter').addEventListener('change', applyFilters);
+
+            initMotion();
+            window.BureauUI.mountTiltCards();
+        }
+
+        window.addEventListener('DOMContentLoaded', boot);
+    </script>
+</body>
+</html>

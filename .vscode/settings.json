@@ -1,0 +1,14 @@
+{
+  "terminal.integrated.defaultProfile.windows": "Poster Bureau PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "Poster Bureau PowerShell": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$p='${workspaceFolder}\\server-node'; if ($p.StartsWith('\\\\?\\')) { $p=$p.Substring(4) }; Set-Location -LiteralPath $p"
+      ],
+      "icon": "terminal-powershell"
+    }
+  }
+}

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poster Vault | The Poster Bureau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="storefront.css" />
+    <style>
+        :root {
+            --vault-bg-1: #f8fafc;
+            --vault-bg-2: #eef2ff;
+            --vault-card: rgba(255, 255, 255, 0.95);
+            --vault-line: rgba(15, 23, 42, 0.08);
+            --vault-ink: #0f172a;
+            --vault-soft: #64748b;
+            --vault-accent: #0f766e;
+            --vault-accent-soft: rgba(15, 118, 110, 0.1);
+        }
+
+        body[data-page="vault"] {
+            background:
+                radial-gradient(circle at 18% 10%, rgba(34, 197, 94, 0.12), transparent 40%),
+                radial-gradient(circle at 85% 20%, rgba(59, 130, 246, 0.1), transparent 45%),
+                linear-gradient(180deg, var(--vault-bg-1) 0%, var(--vault-bg-2) 100%);
+            color: var(--vault-ink);
+        }
+
+        .vault-shell {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 1.2rem 1rem 2.5rem;
+        }
+
+        .vault-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vault-kicker {
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.68rem;
+            color: #0f766e;
+            font-weight: 700;
+        }
+
+        .vault-title {
+            font-size: clamp(1.4rem, 2.5vw, 2.25rem);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-top: 0.35rem;
+            font-weight: 800;
+        }
+
+        .vault-subtitle {
+            color: var(--vault-soft);
+            max-width: 60ch;
+            font-size: 0.93rem;
+            margin-top: 0.35rem;
+        }
+
+        .vault-count {
+            background: rgba(15, 23, 42, 0.95);
+            color: #f8fafc;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .vault-layout {
+            display: grid;
+            grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+            gap: 1.2rem;
+            align-items: start;
+        }
+
+        .vault-sidebar {
+            position: sticky;
+            top: 92px;
+            background: var(--vault-card);
+            border: 1px solid var(--vault-line);
+            border-radius: 18px;
+            padding: 1rem;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        .vault-panel-title {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--vault-soft);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .vault-cat-list {
+            display: grid;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .vault-cat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 0.45rem 0.62rem;
+            color: #1e293b;
+            font-size: 0.87rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .vault-cat-item:hover {
+            background: rgba(15, 118, 110, 0.06);
+            border-color: rgba(15, 118, 110, 0.2);
+            color: #0f172a;
+        }
+
+        .vault-cat-item.is-active {
+            background: var(--vault-accent-soft);
+            border-color: rgba(15, 118, 110, 0.28);
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .vault-input,
+        .vault-select {
+            width: 100%;
+            border: 1px solid var(--vault-line);
+            background: #fff;
+            border-radius: 12px;
+            padding: 0.58rem 0.72rem;
+            font-size: 0.86rem;
+            color: #0f172a;
+        }
+
+        .vault-input:focus,
+        .vault-select:focus {
+            outline: none;
+            border-color: rgba(15, 118, 110, 0.5);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+        }
+
+        .vault-main {
+            background: var(--vault-card);
+            border: 1px solid var(--vault-line);
+            border-radius: 18px;
+            padding: 1rem;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .vault-toolbar {
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) minmax(160px, 220px) minmax(140px, 180px) auto;
+            gap: 0.55rem;
+            margin-bottom: 0.95rem;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.82rem;
+        }
+
+        .vault-card {
+            border: 1px solid var(--vault-line);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-height: 472px;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .vault-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 26px rgba(15, 23, 42, 0.12);
+        }
+
+        .vault-card-media {
+            position: relative;
+            height: 265px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        body[data-page="vault"] .showcase-card .catalog-thumb {
+            aspect-ratio: auto;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        body[data-page="vault"] .showcase-mock {
+            padding: 0.56rem;
+        }
+
+        body[data-page="vault"] .showcase-mock.no-frame {
+            padding: 0.56rem;
+        }
+
+        body[data-page="vault"] .showcase-frame {
+            width: 100%;
+            height: 100%;
+            padding: 0.3rem;
+        }
+
+        body[data-page="vault"] .showcase-frame img,
+        body[data-page="vault"] .showcase-mock.no-frame > img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .vault-media-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .vault-card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .vault-card:hover .vault-card-media img {
+            transform: scale(1.03);
+        }
+
+        .vault-badge {
+            position: absolute;
+            top: 0.48rem;
+            left: 0.62rem;
+            background: rgba(2, 6, 23, 0.84);
+            color: #f8fafc;
+            border-radius: 999px;
+            padding: 0.22rem 0.52rem;
+            font-size: 0.66rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 700;
+            z-index: 3;
+        }
+
+        .vault-card-body {
+            padding: 0.54rem 0.58rem 0.62rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vault-card-title {
+            font-size: 0.86rem;
+            line-height: 1.25;
+            min-height: 2.5em;
+            max-height: 2.5em;
+            font-weight: 700;
+            color: #0f172a;
+            text-decoration: none;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .vault-card-meta {
+            margin-top: 0.22rem;
+            font-size: 0.73rem;
+            color: var(--vault-soft);
+            min-height: 1.15em;
+            max-height: 1.15em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .vault-card-price {
+            margin-top: auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .vault-open-btn {
+            border: 1px solid #0f172a;
+            background: #0f172a;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.33rem 0.82rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .vault-type-row {
+            margin-top: 0.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.45rem;
+            font-size: 0.66rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.11em;
+            color: #64748b;
+        }
+
+        .vault-type-pill {
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            border-radius: 999px;
+            padding: 0.2rem 0.46rem;
+        }
+
+        .vault-btn {
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            background: #fff;
+            border-radius: 9px;
+            padding: 0.3rem 0.52rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .vault-btn.buy {
+            background: #0f172a;
+            color: #fff;
+            border-color: #0f172a;
+        }
+
+        .vault-now {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 0.9rem;
+        }
+
+        .vault-then {
+            font-size: 0.74rem;
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        .vault-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            border: 1px dashed rgba(15, 23, 42, 0.16);
+            border-radius: 16px;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .vault-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .vault-page-btn {
+            border: 1px solid var(--vault-line);
+            background: #fff;
+            border-radius: 10px;
+            min-width: 2.2rem;
+            padding: 0.36rem 0.62rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .vault-page-btn.is-active {
+            background: #0f172a;
+            color: #fff;
+            border-color: #0f172a;
+        }
+
+        @media (max-width: 1080px) {
+            .vault-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .vault-sidebar {
+                position: static;
+            }
+
+            .vault-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .vault-shell {
+                padding-top: 0.9rem;
+            }
+
+            .vault-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .vault-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .vault-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body data-page="vault" class="text-slate-900 antialiased">
+    <header class="site-header sticky top-0 z-50">
+        <div class="nav-container">
+            <div data-shared-nav-shell></div>
+        </div>
+    </header>
+
+    <main class="vault-shell">
+        <section class="vault-header">
+            <div>
+                <p class="vault-kicker">The Poster Bureau</p>
+                <h1 class="vault-title" id="vaultTitle">Poster Vault</h1>
+                <p class="vault-subtitle">Browse every print in one place. Pick a category from the sidebar, then use search and sorting to narrow to the exact vibe you want.</p>
+            </div>
+            <p class="vault-count" id="resultCount">0 posters</p>
+        </section>
+
+        <section class="vault-layout">
+            <aside class="vault-sidebar">
+                <p class="vault-panel-title">Categories</p>
+                <div class="vault-cat-list" id="categoryList"></div>
+
+                <p class="vault-panel-title">Quick Search</p>
+                <input class="vault-input" id="sidebarSearch" type="search" placeholder="Search title, tag, series..." />
+
+                <p class="vault-panel-title" style="margin-top:0.95rem;">Series</p>
+                <select class="vault-select" id="seriesFilter">
+                    <option value="all">All series</option>
+                </select>
+            </aside>
+
+            <section class="vault-main">
+                <div class="vault-toolbar">
+                    <input class="vault-input" id="searchInput" type="search" placeholder="Search posters, tags, offers, collections" />
+                    <select class="vault-select" id="sortSelect">
+                        <option value="featured">Sort: Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="alpha">Name: A to Z</option>
+                        <option value="new">Newest First</option>
+                    </select>
+                    <select class="vault-select" id="viewSelect">
+                        <option value="12" selected>Show: 12</option>
+                    </select>
+                    <button type="button" class="vault-btn buy" id="buyAllBtn">Buy all page</button>
+                </div>
+
+                <div id="productGrid" class="vault-grid"></div>
+                <div id="vaultPagination" class="vault-pagination"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="site-content.js"></script>
+    <script src="catalog.js"></script>
+    <script src="storefront.js"></script>
+    <script>
+        (function () {
+            const CATEGORY_OPTIONS = [
+                'All',
+                'Anime Poster',
+                'Car Poster',
+                'Bike Poster',
+                'Marvel Poster',
+                'Cartoon Poster',
+                'Movie Poster',
+                'Sports Poster'
+            ];
+            const KNOWN_POSTER_CATEGORIES = new Set(CATEGORY_OPTIONS.filter((category) => category !== 'All'));
+
+            const params = new URLSearchParams(window.location.search);
+            const state = {
+                activeCategory: params.get('collection') || 'All',
+                search: '',
+                series: 'all',
+                sort: 'featured',
+                limit: '12',
+                page: 1,
+            };
+
+            let currentPageItems = [];
+
+            const $title = document.getElementById('vaultTitle');
+            const $count = document.getElementById('resultCount');
+            const $grid = document.getElementById('productGrid');
+            const $categoryList = document.getElementById('categoryList');
+            const $search = document.getElementById('searchInput');
+            const $sidebarSearch = document.getElementById('sidebarSearch');
+            const $sort = document.getElementById('sortSelect');
+            const $view = document.getElementById('viewSelect');
+            const $series = document.getElementById('seriesFilter');
+            const $pagination = document.getElementById('vaultPagination');
+            const $buyAllBtn = document.getElementById('buyAllBtn');
+
+            const norm = (value) => String(value || '').trim().toLowerCase();
+            const animeSeries = ['naruto', 'demon slayer', 'one piece', 'jujutsu kaisen', 'dragon ball'];
+
+            function sourceText(item) {
+                return [
+                    item.title,
+                    item.series,
+                    item.collection,
+                    ...(Array.isArray(item.tags) ? item.tags : []),
+                    ...(Array.isArray(item.offers) ? item.offers : [])
+                ].join(' ').toLowerCase();
+            }
+
+            function classify(item) {
+                const collectionLabel = String(item.collection || '').trim();
+                if (KNOWN_POSTER_CATEGORIES.has(collectionLabel)) return collectionLabel;
+
+                const text = sourceText(item);
+                if (/car|automobile|mustang|porsche|ferrari|supra|shelby|nissan|bmw/.test(text)) return 'Car Poster';
+                if (/bike|motorcycle|ducati|yamaha|kawasaki|royal enfield/.test(text)) return 'Bike Poster';
+                if (/marvel|avengers|spider-man|captain america|doctor strange|iron man|thor|thanos|loki|deadpool|wolverine/.test(text)) return 'Marvel Poster';
+                if (/movie|cinema|hollywood|bollywood|film/.test(text)) return 'Movie Poster';
+                if (/sport|football|cricket|f1|formula/.test(text)) return 'Sports Poster';
+                if (/cartoon|animated|pixar|disney|chibi|sanrio/.test(text)) return 'Cartoon Poster';
+                if (animeSeries.some((name) => text.includes(name)) || /anime|manga|otaku/.test(text)) return 'Anime Poster';
+                return 'Anime Poster';
+            }
+
+            function applyCategory(items) {
+                if (state.activeCategory === 'All') return items;
+                return items.filter((item) => classify(item) === state.activeCategory);
+            }
+
+            function applySearch(items) {
+                const term = norm(state.search);
+                if (!term) return items;
+                return items.filter((item) => sourceText(item).includes(term));
+            }
+
+            function applySeries(items) {
+                if (state.series === 'all') return items;
+                return items.filter((item) => norm(item.series) === norm(state.series));
+            }
+
+            function applySort(items) {
+                const sorted = [...items];
+                if (state.sort === 'price-asc') sorted.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+                if (state.sort === 'price-desc') sorted.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+                if (state.sort === 'alpha') sorted.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+                if (state.sort === 'new') sorted.sort((a, b) => {
+                    const aTime = new Date(a.createdAt || 0).getTime();
+                    const bTime = new Date(b.createdAt || 0).getTime();
+                    return bTime - aTime;
+                });
+                return sorted;
+            }
+
+            function applyLimit(items) {
+                if (state.limit === 'all') return items;
+                const count = Number(state.limit);
+                if (!Number.isFinite(count) || count <= 0) return items;
+                const start = (state.page - 1) * count;
+                return items.slice(start, start + count);
+            }
+
+            function getTotalPages(totalItems) {
+                if (state.limit === 'all') return 1;
+                const count = Number(state.limit);
+                if (!Number.isFinite(count) || count <= 0) return 1;
+                return Math.max(1, Math.ceil(totalItems / count));
+            }
+
+            function renderCategories(items) {
+                const counts = CATEGORY_OPTIONS.reduce((acc, category) => {
+                    acc[category] = category === 'All'
+                        ? items.length
+                        : items.filter((item) => classify(item) === category).length;
+                    return acc;
+                }, {});
+
+                $categoryList.innerHTML = CATEGORY_OPTIONS.map((category) => {
+                    const activeClass = category === state.activeCategory ? 'is-active' : '';
+                    const href = category === 'All'
+                        ? 'collections.html?collection=All'
+                        : `collections.html?collection=${encodeURIComponent(category)}`;
+                    return `
+                        <a class="vault-cat-item ${activeClass}" href="${href}" data-category="${category}">
+                            <span>${category}</span>
+                            <strong>${counts[category]}</strong>
+                        </a>
+                    `;
+                }).join('');
+            }
+
+            function renderSeries(items) {
+                const values = Array.from(new Set(items.map((item) => String(item.series || '').trim()).filter(Boolean))).sort();
+                const options = ['<option value="all">All series</option>']
+                    .concat(values.map((value) => `<option value="${value}">${value}</option>`));
+                $series.innerHTML = options.join('');
+                $series.value = values.includes(state.series) ? state.series : 'all';
+            }
+
+            function posterCard(item) {
+                const productUrl = window.BureauCatalog.buildProductUrl(item);
+                const comparePrice = Number(item.comparePrice || 0);
+                const hasCompare = comparePrice > Number(item.price || 0);
+                return `
+                    <article class="vault-card">
+                        <div class="vault-card-media">
+                            <a class="vault-media-link" href="${productUrl}">
+                                <span class="showcase-sale">Sale</span>
+                                <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
+                                <span class="vault-badge">${item.series || classify(item)}</span>
+                            </a>
+                        </div>
+                        <div class="vault-card-body">
+                            <div class="vault-type-row">
+                                <span class="vault-type-pill">${item.series || 'Poster'}</span>
+                                <span>${item.type || 'Poster'}</span>
+                            </div>
+                            <a class="vault-card-title" href="${productUrl}">${item.title}</a>
+                            <p class="vault-card-meta">${item.series || 'Curated Release'}</p>
+                            <div class="vault-card-price">
+                                <div>
+                                    <p class="text-[0.68rem] font-semibold text-slate-500 mb-1">Stock: ${Number(item.stock || 0)}</p>
+                                    <p class="vault-now">${window.BureauCatalog.money(item.price)}</p>
+                                    ${hasCompare ? `<p class="vault-then">${window.BureauCatalog.money(comparePrice)}</p>` : ''}
+                                </div>
+                                <a href="${productUrl}" class="vault-open-btn">Open</a>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }
+
+            function lineItem(item) {
+                return {
+                    id: item.id,
+                    slug: item.slug,
+                    title: item.title,
+                    price: Number(item.price || 0),
+                    image_url: item.image_url,
+                };
+            }
+
+            function renderPagination(totalItems) {
+                const pages = getTotalPages(totalItems);
+                if (pages <= 1) {
+                    $pagination.innerHTML = '';
+                    return;
+                }
+
+                const buttons = [];
+                buttons.push(`<button class="vault-page-btn" data-page="prev">Prev</button>`);
+                for (let i = 1; i <= pages; i += 1) {
+                    buttons.push(`<button class="vault-page-btn ${i === state.page ? 'is-active' : ''}" data-page="${i}">${i}</button>`);
+                }
+                buttons.push(`<button class="vault-page-btn" data-page="next">Next</button>`);
+                $pagination.innerHTML = buttons.join('');
+            }
+
+            function updateUrl() {
+                const url = new URL(window.location.href);
+                url.searchParams.set('collection', state.activeCategory);
+                window.history.replaceState({}, '', url);
+            }
+
+            function bindEvents(dataset) {
+                $search.addEventListener('input', (event) => {
+                    state.search = event.target.value;
+                    $sidebarSearch.value = state.search;
+                    render(dataset);
+                });
+
+                $sidebarSearch.addEventListener('input', (event) => {
+                    state.search = event.target.value;
+                    $search.value = state.search;
+                    render(dataset);
+                });
+
+                $sort.addEventListener('change', (event) => {
+                    state.sort = event.target.value;
+                    state.page = 1;
+                    render(dataset);
+                });
+
+                $view.addEventListener('change', (event) => {
+                    state.limit = event.target.value;
+                    state.page = 1;
+                    render(dataset);
+                });
+
+                $series.addEventListener('change', (event) => {
+                    state.series = event.target.value;
+                    state.page = 1;
+                    render(dataset);
+                });
+
+                $categoryList.addEventListener('click', (event) => {
+                    const link = event.target.closest('[data-category]');
+                    if (!link) return;
+                    event.preventDefault();
+                    state.activeCategory = link.dataset.category || 'All';
+                    state.page = 1;
+                    updateUrl();
+                    render(dataset);
+                });
+
+                $pagination.addEventListener('click', (event) => {
+                    const btn = event.target.closest('[data-page]');
+                    if (!btn) return;
+                    const key = btn.getAttribute('data-page');
+                    const totalPages = getTotalPages(applySort(applySeries(applySearch(applyCategory(dataset)))).length);
+                    if (key === 'prev') state.page = Math.max(1, state.page - 1);
+                    else if (key === 'next') state.page = Math.min(totalPages, state.page + 1);
+                    else state.page = Math.max(1, Math.min(totalPages, Number(key) || 1));
+                    render(dataset);
+                });
+
+                $grid.addEventListener('click', (event) => {
+                    const button = event.target.closest('[data-buy-id]');
+                    if (!button) return;
+                    const id = button.getAttribute('data-buy-id');
+                    const item = dataset.find((entry) => String(entry.id) === String(id));
+                    if (!item) return;
+                    window.BureauCatalog.writeCart([lineItem(item)]);
+                    window.location.href = 'checkout.html';
+                });
+
+                $buyAllBtn.addEventListener('click', () => {
+                    if (!currentPageItems.length) return;
+                    const lines = currentPageItems.map(lineItem);
+                    window.BureauCatalog.writeCart(lines);
+                    window.location.href = 'checkout.html';
+                });
+            }
+
+            function render(dataset) {
+                renderCategories(dataset);
+                renderSeries(dataset);
+
+                const scoped = applySort(applySeries(applySearch(applyCategory(dataset))));
+                const totalPages = getTotalPages(scoped.length);
+                if (state.page > totalPages) state.page = totalPages;
+                const filtered = applyLimit(scoped);
+                currentPageItems = filtered;
+                const label = state.activeCategory === 'All' ? 'Poster Vault' : state.activeCategory;
+                $title.textContent = label;
+                $count.textContent = `${scoped.length} poster${scoped.length === 1 ? '' : 's'}`;
+                renderPagination(scoped.length);
+
+                if (!filtered.length) {
+                    $grid.innerHTML = `
+                        <div class="vault-empty">
+                            <p class="font-semibold text-slate-800">No posters match this filter.</p>
+                            <p class="mt-1">Try another category, clear search, or switch sorting.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                $grid.innerHTML = filtered.map((item) => posterCard(item)).join('');
+            }
+
+            async function init() {
+                if (!window.BureauCatalog || !window.BureauCatalog.fetchCatalog) {
+                    $grid.innerHTML = '<p class="vault-empty">Catalog loader is unavailable.</p>';
+                    return;
+                }
+
+                if (window.posterBureauMountNav) {
+                    window.posterBureauMountNav({ current: 'vault' });
+                } else if (window.BureauUI && window.BureauUI.hydrateNavigation) {
+                    window.BureauUI.hydrateNavigation({ current: 'vault' });
+                }
+
+                const all = await window.BureauCatalog.fetchCatalog();
+                const postersOnly = all.filter((item) => String(item.kind || '').toLowerCase() === 'poster');
+                bindEvents(postersOnly);
+                render(postersOnly);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

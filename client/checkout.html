@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUREAU | Checkout</title>
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pay-option { border:1px solid rgb(226 232 240); border-radius:0.9rem; padding:0.7rem 0.8rem; display:flex; align-items:center; gap:0.6rem; cursor:pointer; }
+        .pay-option:has(input:checked) { border-color: rgb(99 102 241); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+        .mascot {
+            width: 84px;
+            height: 84px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 35% 30%, #fde68a, #f59e0b 68%);
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            animation: mascotBounce 1.9s ease-in-out infinite;
+            box-shadow: 0 14px 28px rgba(245, 158, 11, 0.32);
+        }
+        .mascot-wrap { display:flex; align-items:center; gap:0.7rem; background:rgb(255 251 235); border:1px solid rgb(254 243 199); border-radius:1rem; padding:0.7rem; }
+        @keyframes mascotBounce {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-extrabold tracking-tight">
+                BUREAU<span class="text-indigo-600">.</span>
+            </a>
+            <div class="flex items-center gap-3 text-sm font-bold">
+                <a href="store.html" class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition text-slate-700">Store</a>
+                <a href="account.html" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white transition">Account</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-10 md:py-14">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <section class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200">
+                        <h1 class="text-2xl font-extrabold">Checkout</h1>
+                        <p class="text-slate-500 font-medium mt-1">Place a real demo order that gets saved to your account history.</p>
+                    </div>
+                    <form id="checkout-form" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Full Name</label>
+                            <input id="full-name" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="Your full name" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Email</label>
+                            <input id="email" type="email" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="you@email.com" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Phone</label>
+                            <input id="phone" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="Phone number" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Address Line 1</label>
+                            <input id="address-line-1" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="House, street, area" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Address Line 2</label>
+                            <input id="address-line-2" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="Apartment, landmark (optional)">
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">City</label>
+                            <input id="city" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="City" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">State</label>
+                            <input id="state" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="State" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Postal Code</label>
+                            <input id="postal-code" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" placeholder="Postal code" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Country</label>
+                            <input id="country" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10" value="India" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Order Notes</label>
+                            <textarea id="notes" class="mt-2 w-full bg-white border border-slate-200 px-4 py-3 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 h-28 resize-none" placeholder="Frame preference, delivery note, gift request, etc."></textarea>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-extrabold">Order Items</h2>
+                            <p class="text-slate-500 text-sm font-medium mt-1">Your cart is grouped into clean order lines before submission.</p>
+                        </div>
+                        <a href="index.html#vault" class="text-sm font-bold text-indigo-600 hover:text-slate-900 transition">Back to vault</a>
+                    </div>
+                    <div id="items" class="p-6 space-y-4"></div>
+                </section>
+
+                <section class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200">
+                        <h2 class="text-xl font-extrabold">Payment method</h2>
+                        <p class="text-slate-500 text-sm font-medium mt-1">Choose how you want to pay for this order.</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label class="pay-option"><input type="radio" name="payment" value="UPI" checked><span class="font-bold">UPI (GPay / PhonePe / Paytm)</span></label>
+                        <label class="pay-option"><input type="radio" name="payment" value="Card"><span class="font-bold">Card (Credit / Debit)</span></label>
+                        <label class="pay-option"><input type="radio" name="payment" value="NetBanking"><span class="font-bold">Net Banking</span></label>
+                        <label class="pay-option"><input type="radio" name="payment" value="COD"><span class="font-bold">Cash on Delivery</span></label>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="bg-white border border-slate-200 rounded-3xl shadow-sm p-6 h-fit sticky top-24">
+                <div class="text-xs font-extrabold uppercase tracking-widest text-slate-500">Order Summary</div>
+                <div class="mt-3 text-4xl font-extrabold" id="total">$0.00</div>
+                <div class="mt-5 space-y-3 text-sm font-medium text-slate-600">
+                    <div class="flex justify-between"><span>Items</span><span id="summary-items">0</span></div>
+                    <div class="flex justify-between"><span>Shipping</span><span class="text-emerald-600 font-bold">Free</span></div>
+                    <div class="flex justify-between"><span>Status</span><span class="font-bold text-indigo-600">Saved to account</span></div>
+                </div>
+                <button id="pay" class="mt-6 w-full bg-slate-900 hover:bg-indigo-600 text-white py-3.5 rounded-xl font-extrabold transition shadow-md">
+                    Place order
+                </button>
+                <div id="checkout-error" class="hidden mt-4 text-sm text-red-600 font-semibold"></div>
+                <div id="checkout-success" class="hidden mt-4 text-sm text-emerald-600 font-semibold"></div>
+                <div class="mascot-wrap mt-5">
+                    <div class="mascot" aria-hidden="true">🎴</div>
+                    <p class="text-xs font-semibold text-amber-700">Your anime buddy is cheering while your order gets packed.</p>
+                </div>
+                <p class="mt-4 text-xs text-slate-500 font-semibold">This is still a sandbox checkout, but orders are now stored in your backend and visible on the account page.</p>
+            </aside>
+        </div>
+    </main>
+
+    <div id="order-modal" class="hidden fixed inset-0 bg-slate-950/45 backdrop-blur-sm z-[90] p-4">
+        <div class="max-w-md mx-auto mt-24 bg-white rounded-3xl border border-slate-200 p-6 shadow-2xl">
+            <div class="text-3xl">✅</div>
+            <h3 class="text-2xl font-extrabold mt-3">Order Confirmed</h3>
+            <p class="text-slate-600 mt-2">Order ID: <strong id="order-modal-id">-</strong></p>
+            <p class="text-slate-600 mt-1">Your order is completed and saved to your account history.</p>
+            <div class="mt-5 flex gap-3">
+                <a href="account.html" class="flex-1 text-center px-4 py-3 rounded-xl bg-slate-900 text-white font-extrabold">Go to account</a>
+                <a href="collections.html" class="flex-1 text-center px-4 py-3 rounded-xl border border-slate-200 font-extrabold">More posters</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TOKEN_KEY = 'bureau_user_token';
+        const CART_KEY = 'bureau_cart_v1';
+        const API_ORIGIN = (location.origin && location.origin !== 'null') ? location.origin : 'http://localhost:5000';
+        const API_URL = `${API_ORIGIN}/api`;
+
+        function decodeJwt(token) {
+            try {
+                const payload = token.split('.')[1];
+                const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+                return JSON.parse(json);
+            } catch {
+                return null;
+            }
+        }
+
+        function money(n) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 2,
+            }).format(Number(n || 0));
+        }
+
+        function authHeaders() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            return token ? { Authorization: `Bearer ${token}` } : {};
+        }
+
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+            window.location.href = 'login.html?returnTo=checkout.html';
+        }
+
+        const viewer = decodeJwt(token || '');
+
+        function groupCartItems(items) {
+            const grouped = new Map();
+            (Array.isArray(items) ? items : []).forEach((item) => {
+                const key = [item.id || '', item.title || '', Number(item.price || 0), item.image_url || '', item.size || ''].join('::');
+                if (!grouped.has(key)) {
+                    grouped.set(key, {
+                        id: item.id || '',
+                        title: item.title || 'Item',
+                        image_url: item.image_url || '',
+                        size: String(item.size || '').trim(),
+                        quantity: 0,
+                        unit_price: Number(item.price || 0),
+                    });
+                }
+                grouped.get(key).quantity += 1;
+            });
+
+            return Array.from(grouped.values()).map((item) => ({
+                ...item,
+                line_total: Number((item.quantity * item.unit_price).toFixed(2)),
+            }));
+        }
+
+        let rawCart = [];
+        try {
+            const parsed = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            if (Array.isArray(parsed)) rawCart = parsed;
+        } catch {
+            rawCart = [];
+        }
+
+        const orderItems = groupCartItems(rawCart);
+        const total = orderItems.reduce((sum, item) => sum + item.line_total, 0);
+        const itemsHost = document.getElementById('items');
+
+        if (viewer) {
+            document.getElementById('full-name').value = viewer.name || '';
+            document.getElementById('email').value = viewer.email || '';
+        }
+
+        if (!orderItems.length) {
+            itemsHost.innerHTML = `<div class="text-center text-slate-500 font-medium py-12"><i class="fas fa-basket-shopping text-4xl mb-4 text-slate-300"></i><div>Your cart is empty.</div><a class="inline-flex mt-6 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-slate-900 text-white font-extrabold transition" href="index.html#vault">Back to store</a></div>`;
+            document.getElementById('pay').disabled = true;
+            document.getElementById('pay').classList.add('opacity-60', 'cursor-not-allowed');
+        } else {
+            itemsHost.innerHTML = orderItems.map((item, index) => `
+                <div class="flex items-center justify-between gap-4 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-center gap-4 min-w-0">
+                        <div class="w-16 h-16 rounded-xl bg-white border border-slate-200 overflow-hidden flex-shrink-0">
+                            <img src="${item.image_url || ''}" class="w-full h-full object-cover" alt="${item.title}">
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-extrabold truncate">${item.title}</div>
+                            <div class="text-sm text-slate-500 font-semibold">${money(item.unit_price)} each</div>
+                            ${item.size ? `<div class="text-xs text-slate-500 font-bold mt-1">Size: ${item.size}</div>` : ''}
+                            <div class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Qty ${item.quantity}</div>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="font-extrabold text-lg">${money(item.line_total)}</div>
+                        <button class="mt-2 text-xs font-bold text-red-600 hover:text-red-700" onclick="removeLine(${index})">Remove line</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('summary-items').innerText = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('total').innerText = money(total);
+
+        function removeLine(index) {
+            const target = orderItems[index];
+            if (!target) return;
+            rawCart = rawCart.filter((item) => !(
+                String(item.id || '') === String(target.id || '')
+                && String(item.title || '') === String(target.title || '')
+                && Number(item.price || 0) === Number(target.unit_price || 0)
+                && String(item.size || '') === String(target.size || '')
+            ));
+            localStorage.setItem(CART_KEY, JSON.stringify(rawCart));
+            window.location.reload();
+        }
+
+        function collectShipping() {
+            return {
+                fullName: document.getElementById('full-name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                addressLine1: document.getElementById('address-line-1').value.trim(),
+                addressLine2: document.getElementById('address-line-2').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                state: document.getElementById('state').value.trim(),
+                postalCode: document.getElementById('postal-code').value.trim(),
+                country: document.getElementById('country').value.trim(),
+            };
+        }
+
+        function showError(message) {
+            const success = document.getElementById('checkout-success');
+            const error = document.getElementById('checkout-error');
+            success.classList.add('hidden');
+            success.innerText = '';
+            error.innerText = message;
+            error.classList.remove('hidden');
+        }
+
+        function showSuccess(message) {
+            const success = document.getElementById('checkout-success');
+            const error = document.getElementById('checkout-error');
+            error.classList.add('hidden');
+            error.innerText = '';
+            success.innerText = message;
+            success.classList.remove('hidden');
+        }
+
+        document.getElementById('pay').addEventListener('click', async () => {
+            if (!orderItems.length) return;
+
+            const payload = {
+                items: orderItems,
+                shipping: collectShipping(),
+                notes: document.getElementById('notes').value.trim(),
+                paymentMethod: (document.querySelector('input[name="payment"]:checked') || {}).value || 'UPI',
+                paymentStatus: 'Paid',
+            };
+
+            for (const [key, value] of Object.entries(payload.shipping)) {
+                if (['addressLine2'].includes(key)) continue;
+                if (!value) {
+                    return showError(`Please fill ${key}.`);
+                }
+            }
+
+            const button = document.getElementById('pay');
+            button.disabled = true;
+            button.innerText = 'Placing order...';
+
+            try {
+                const res = await fetch(`${API_URL}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'Order failed');
+
+                localStorage.setItem(CART_KEY, JSON.stringify([]));
+                showSuccess(`Order ${data.orderNumber} saved successfully.`);
+                document.getElementById('order-modal-id').textContent = data.orderNumber || '-';
+                document.getElementById('order-modal').classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = 'account.html';
+                }, 2100);
+            } catch (err) {
+                showError(err && err.message ? err.message : 'Order failed');
+            } finally {
+                button.disabled = false;
+                button.innerText = 'Place order';
+            }
+        });
+    </script>
+</body>
+</html>
